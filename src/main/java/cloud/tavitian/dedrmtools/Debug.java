@@ -11,7 +11,7 @@ public final class Debug {
         if (DEBUG) System.out.println(message);
     }
 
-    public static void enableDebug() {
-        DEBUG = true;
+    public static void setDebug(boolean debug) {
+        DEBUG = debug;
     }
 }

@@ -30,7 +30,7 @@ public class Main {
             } else if (args[i].equals("-s") || args[i].equals("--serial")) {
                 serials = commaSeparatedStringToSet(args[++i]);
             } else if (args[i].equals("-v") || args[i].equals("--verbose")) {
-                Debug.enableDebug();
+                Debug.setDebug(true);
             } else if (args[i].equals("-h") || args[i].equals("--help")) {
                 usage();
                 System.exit(0);
