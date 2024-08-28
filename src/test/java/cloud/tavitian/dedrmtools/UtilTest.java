@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static cloud.tavitian.dedrmtools.Util.printKeyVal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class UtilTest {
@@ -27,21 +26,17 @@ final class UtilTest {
         String result2 = Util.formatByteArray(bytes2);
         String result3 = Util.formatByteArray(bytes3);
 
-        printKeyVal("result1", result1);
-        printKeyVal("result2", result2);
-        printKeyVal("result3", result3);
-
         assertEquals(expected1, result1);
         assertEquals(expected2, result2);
         assertEquals(expected3, result3);
     }
 
     @Test
-    void leftJustifyBytes() {
+    void ljustBytes() {
     }
 
     @Test
-    void checksum() {
+    void sumBytes() {
     }
 
     @Test

@@ -177,27 +177,51 @@ public final class KindleDatabase extends LinkedHashMap<String, String> {
         return containsUserName() ? getUserNameBytes() : defaultValue;
     }
 
+    /**
+     * @return <code>kindle.account.tokens</code> as a byte array, or an empty byte array if the token is not present.
+     */
     public byte[] genKindleAccountToken() {
         return getKindleAccountTokenBytesOrDefault(new byte[0]);
     }
 
+    /**
+     * @return <code>SerialNumber</code> as a byte array, or <code>IDString</code> as a byte array if <code>SerialNumber</code> is not present.
+     */
     public byte[] genIdString() {
         return getSerialNumberBytesOrDefault(getIDStringBytes());
     }
 
+    /**
+     * @return The encoded MD5 hash of {@link #genIdString()} as a byte array.
+     * @throws NoSuchAlgorithmException If the MD5 algorithm is not available.
+     */
     public byte[] genEncodedIdString() throws NoSuchAlgorithmException {
         return encodeHash(genIdString());
     }
 
+    /**
+     * @return <code>UsernameHash</code> as a byte array, or the encoded MD5 hash of <code>UserName</code> as a byte array if <code>UsernameHash</code> is not present.
+     * @throws NoSuchAlgorithmException If the MD5 algorithm is not available.
+     */
     public byte[] genEncodedUsername() throws NoSuchAlgorithmException {
         return getUsernameHashBytesOrDefault(encodeHash(getUserNameBytes()));
     }
 
+    /**
+     * @return <code>DSN</code> as a byte array, or the result of {@link #genAltDSN()} as a byte array if <code>DSN</code> is not present.
+     * @throws NoSuchAlgorithmException if the SHA-1 algorithm is not available.
+     */
     public byte[] genDSN() throws NoSuchAlgorithmException {
-        return getDSNBytesOrDefault(genAltDSN());
+        byte[] derivedDSN = getDSNBytesOrDefault(genAltDSN());
+        Debug.log(String.format("Derived DSN: %s", formatByteArray(derivedDSN)));
+        return derivedDSN;
     }
 
-    public byte[] genAltDSN() throws NoSuchAlgorithmException {
+    /**
+     * @return The encoded SHA-1 hash of the concatenation of <code>MazamaRandomNumber</code>, {@link #genEncodedIdString()}, and {@link #genEncodedUsername()}, as a byte array.
+     * @throws NoSuchAlgorithmException If the SHA-1 algorithm is not available.
+     */
+    private byte[] genAltDSN() throws NoSuchAlgorithmException {
         return encode(sha1(getMazamaRandomNumberBytes(), genEncodedIdString(), genEncodedUsername()));
     }
 }

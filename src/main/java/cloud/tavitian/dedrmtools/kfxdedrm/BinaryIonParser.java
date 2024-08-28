@@ -296,7 +296,7 @@ public final class BinaryIonParser {
 
         try {
             return readVarUInt();
-        } catch (Exception e) {
+        } catch (Exception _) {
             return -1;
         }
     }

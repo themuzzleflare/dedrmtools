@@ -12,6 +12,7 @@ import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -108,6 +109,11 @@ public final class DeDRM {
         return result.toString();
     }
 
+    private static Set<String> sanitiseStringSet(Set<String> set) {
+        if (set == null || set.isEmpty() || set.stream().allMatch(String::isEmpty)) return Collections.emptySet();
+        else return set;
+    }
+
     private static String calculateOutfileName(String filename, String booktitle) {
         String origFnRoot = new BookFile(filename).getRoot();
 
@@ -132,12 +138,14 @@ public final class DeDRM {
     private static Set<KDatabase> loadKDatabases(Set<String> kDatabaseFiles) {
         Set<KDatabase> kDatabases = new LinkedHashSet<>();
 
+        if (sanitiseStringSet(kDatabaseFiles).isEmpty()) return kDatabases;
+
         for (String kDatabaseFile : kDatabaseFiles) {
             try (FileReader reader = new FileReader(kDatabaseFile)) {
                 KindleDatabase kindleDatabase = gson.fromJson(reader, KindleDatabase.class);
                 KDatabase kDatabase = new KDatabase(kDatabaseFile, kindleDatabase);
                 kDatabases.add(kDatabase);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.err.printf("Error getting database from file %s: %s%n", kDatabaseFile, e.getMessage());
                 e.printStackTrace();
             }
@@ -174,7 +182,7 @@ public final class DeDRM {
     }
 
     private static Book getDecryptedBook(String infile, Set<KDatabase> kDatabases, Set<String> serials, Set<String> pids, long startTime) throws Exception {
-        Book mb;
+        Book book;
 
         boolean mobi = true;
 
@@ -192,18 +200,18 @@ public final class DeDRM {
 
         if (Arrays.equals(magic3, topazBytes)) mobi = false;
 
-        if (Arrays.equals(magic4, pkBytes)) mb = new KFXZipBook(infile);
-        else if (mobi) mb = new MobiBook(infile);
-        else mb = new TopazBook(infile);
+        if (Arrays.equals(magic4, pkBytes)) book = new KFXZipBook(infile);
+        else if (mobi) book = new MobiBook(infile);
+        else book = new TopazBook(infile);
 
-        String bookname = unescape(mb.getBookTitle());
-        String booktype = mb.getBookType();
+        String bookname = unescape(book.getBookTitle());
+        String booktype = book.getBookType();
 
         System.out.printf("Decrypting %s eBook: %s%n", booktype, bookname);
 
         Set<String> totalPids = new LinkedHashSet<>(pids);
 
-        PIDMetaInfo pidMetaInfo = mb.getPidMetaInfo();
+        PIDMetaInfo pidMetaInfo = book.getPidMetaInfo();
 
         byte[] rec209 = pidMetaInfo.rec209();
         byte[] token = pidMetaInfo.token();
@@ -213,23 +221,21 @@ public final class DeDRM {
         System.out.printf("Found %d keys to try after %.1f seconds%n", totalPids.size(), (System.currentTimeMillis() - startTime) / 1000.0);
 
         try {
-            mb.processBook(totalPids);
+            book.processBook(totalPids);
         } catch (Exception e) {
-            mb.cleanup(); // for Topaz books
+            book.cleanup(); // for Topaz books
             throw e;
         }
 
         System.out.printf("Decryption succeeded after %.1f seconds%n", (System.currentTimeMillis() - startTime) / 1000.0);
 
-        return mb;
+        return book;
     }
 
     public static void decryptBook(String infile, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {
-        if (kDatabaseFiles == null) kDatabaseFiles = Collections.emptySet();
-
-        if (serials == null) serials = Collections.emptySet();
-
-        if (pids == null) pids = Collections.emptySet();
+        kDatabaseFiles = sanitiseStringSet(kDatabaseFiles);
+        serials = sanitiseStringSet(serials);
+        pids = sanitiseStringSet(pids);
 
         long startTime = System.currentTimeMillis();
 
@@ -247,11 +253,9 @@ public final class DeDRM {
     public static void decryptBooks(Set<String> infiles, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {
         long startTime = System.currentTimeMillis();
 
-        if (kDatabaseFiles == null) kDatabaseFiles = Collections.emptySet();
-
-        if (serials == null) serials = Collections.emptySet();
-
-        if (pids == null) pids = Collections.emptySet();
+        kDatabaseFiles = sanitiseStringSet(kDatabaseFiles);
+        serials = sanitiseStringSet(serials);
+        pids = sanitiseStringSet(pids);
 
         System.out.printf("K4MobiDeDrm v%s.%n%s.%n", version, copyright);
         System.out.println("Removes DRM protection from Mobipocket, Amazon KF8, Amazon Print Replica, and Amazon Topaz eBooks.");

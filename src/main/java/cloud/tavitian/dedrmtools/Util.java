@@ -14,6 +14,10 @@ import java.util.zip.CRC32;
 public final class Util {
     public static final String copyright = "Copyright © 2022-2024 Paul Tavitian";
 
+    /**
+     * @param byteArray The byte array to format as a string.
+     * @return A string representation of the byte array, resembling a Python byte string.
+     */
     public static String formatByteArray(byte[] byteArray) {
         StringBuilder sb = new StringBuilder("b'");
 
@@ -30,23 +34,33 @@ public final class Util {
         return sb.toString();
     }
 
-    public static byte[] leftJustifyBytes(byte[] data, int width, byte padByte) {
+    /**
+     * @param data    The byte array to to left-justify.
+     * @param width   The desired width of the resulting byte array.
+     * @param padByte The byte to use for padding.
+     * @return A new byte array of the specified width, with <code>data</code> left-justified and padded with <code>padByte</code>.
+     */
+    public static byte[] ljustBytes(byte[] data, int width, byte padByte) {
         if (data.length >= width)
             return data; // No padding needed if the original array is already long enough
 
-        byte[] result = Arrays.copyOf(data, width);
+        byte[] result = Arrays.copyOf(data, width); // Create a new array of 'width' size and copy 'data' into it
 
-        Arrays.fill(result, data.length, width, padByte);
+        Arrays.fill(result, data.length, width, padByte); // Fill the rest of the array with 'padByte'
 
         return result;
     }
 
-    public static int checksum(byte[] data) {
+    /**
+     * @param data The byte array to calculate the sum of.
+     * @return The checksum of the byte array.
+     */
+    public static int sumBytes(byte[] data) {
         int sum = 0;
 
-        for (byte b : data) sum += (b & 0xFF);
+        for (byte b : data) sum += b & 0xFF; // Use & 0xFF to ensure each byte is treated as an unsigned value
 
-        return sum & 0xFF;
+        return sum & 0xFF; // Apply & 0xFF to keep the result within 8 bits
     }
 
     /**
@@ -62,6 +76,11 @@ public final class Util {
     // Helper function to convert hex string to byte array
     public static byte[] hexStringToByteArray(String s) {
         return HexFormat.of().parseHex(s);
+    }
+
+    // Helper function to convert byte array to hex string
+    public static String byteArrayToHexString(byte[] data) {
+        return HexFormat.of().formatHex(data);
     }
 
     // Helper function to concatenate byte arrays

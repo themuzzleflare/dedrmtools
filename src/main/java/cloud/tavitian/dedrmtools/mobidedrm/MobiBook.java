@@ -283,9 +283,9 @@ public final class MobiBook extends Book {
 
         for (String pid : pidSet) {
             byte[] bigPidBytes = pid.getBytes(StandardCharsets.UTF_8); // Convert the string PID to bytes
-            byte[] bigPid = leftJustifyBytes(bigPidBytes, 16, (byte) 0); // Pad the PID to 16 bytes
+            byte[] bigPid = ljustBytes(bigPidBytes, 16, (byte) 0); // Pad the PID to 16 bytes
             byte[] tempKey = pc1(keyvec1, bigPid, false); // Encrypt the padded PID with the keyvec1 to get a temp key
-            int tempKeySum = checksum(tempKey); // Calculate the checksum of the temp key
+            int tempKeySum = sumBytes(tempKey); // Calculate the checksum of the temp key
 
             for (int i = 0; i < count; i++) {
                 // python: verification, size, type, cksum, cookie = struct.unpack('>LLLBxxx32s', data[i * 0x30:i * 0x30 + 0x30])
@@ -335,7 +335,7 @@ public final class MobiBook extends Book {
         if (foundKey == null) {
             // Then try the default encoding that doesn't require a PID
             foundPid = "00000000"; // Set the found PID to the default PID
-            int tempKeySum = checksum(keyvec1); // Now using keyvec1 as the temp key. Calculate the checksum of keyvec1
+            int tempKeySum = sumBytes(keyvec1); // Now using keyvec1 as the temp key. Calculate the checksum of keyvec1
 
             for (int i = 0; i < count; i++) {
                 ByteBuffer buffer = ByteBuffer.wrap(data, i * 0x30, 0x30);
