@@ -50,4 +50,7 @@ public final class KFXTables {
     public static final List<Integer> d0x6a0d4e80 = Key29.d0x6a0d4e80;
     public static final List<Integer> d0x6a0cfe80 = Key30.d0x6a0cfe80;
     public static final List<Integer> d0x6a0d3e80 = Key31.d0x6a0d3e80;
+
+    private KFXTables() {
+    }
 }

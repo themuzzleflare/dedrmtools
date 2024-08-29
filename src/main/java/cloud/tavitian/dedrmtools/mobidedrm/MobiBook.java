@@ -4,7 +4,10 @@
 
 package cloud.tavitian.dedrmtools.mobidedrm;
 
-import cloud.tavitian.dedrmtools.*;
+import cloud.tavitian.dedrmtools.Book;
+import cloud.tavitian.dedrmtools.Debug;
+import cloud.tavitian.dedrmtools.PIDMetaInfo;
+import cloud.tavitian.dedrmtools.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -390,6 +393,7 @@ public final class MobiBook extends Book {
         return Arrays.copyOfRange(dataFile, off, endoff);
     }
 
+    @Override
     public String getBookTitle() {
         Map<Integer, String> codecMap = new LinkedHashMap<>();
 
@@ -424,6 +428,7 @@ public final class MobiBook extends Book {
         return new String(title, Charset.forName(codec));
     }
 
+    @Override
     public PIDMetaInfo getPidMetaInfo() {
         byte[] rec209 = new byte[0];
 
@@ -468,12 +473,14 @@ public final class MobiBook extends Book {
         patchSection(section, newContent, 0);
     }
 
+    @Override
     public void getFile(String outpath) throws IOException {
         FileOutputStream fos = new FileOutputStream(outpath);
         fos.write(mobiData);
         fos.close();
     }
 
+    @Override
     public String getBookType() {
         if (printReplica) return "Print Replica";
 
@@ -484,6 +491,7 @@ public final class MobiBook extends Book {
         return "PalmDoc";
     }
 
+    @Override
     public String getBookExtension() {
         if (printReplica) return ".azw4";
 
@@ -492,6 +500,7 @@ public final class MobiBook extends Book {
         return ".mobi";
     }
 
+    @Override
     public void processBook(Set<String> pidSet) throws Exception {
         cryptoType = ByteBuffer.wrap(sect, 0xC, 2).getShort();
 
@@ -531,8 +540,8 @@ public final class MobiBook extends Book {
         // Normalise PID list
         Set<String> goodPids = normalisePids(pidSet);
 
-        Debug.log(String.format("PIDs: %s", pidSet));
-        Debug.log(String.format("Good PIDs: %s", goodPids));
+        Debug.println(String.format("PIDs: %s", pidSet));
+        Debug.println(String.format("Good PIDs: %s", goodPids));
 
         byte[] foundKey;
         String pid;

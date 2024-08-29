@@ -4,7 +4,6 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
-import cloud.tavitian.dedrmtools.BytesIOInputStream;
 import org.tukaani.xz.LZMAInputStream;
 
 import javax.crypto.Cipher;
@@ -16,9 +15,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import static cloud.tavitian.dedrmtools.kfxdedrm.IonConstants.*;
+import static cloud.tavitian.dedrmtools.kfxdedrm.IonUtils.*;
 
-public final class DRMIon {
+final class DRMIon {
     private final BinaryIonParser ion;
     private final DRMIonVoucher voucher;
     private String voucherName = "";

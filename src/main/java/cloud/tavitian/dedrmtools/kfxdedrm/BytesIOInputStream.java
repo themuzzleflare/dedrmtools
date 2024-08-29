@@ -2,11 +2,11 @@
  * Copyright © 2024 Paul Tavitian.
  */
 
-package cloud.tavitian.dedrmtools;
+package cloud.tavitian.dedrmtools.kfxdedrm;
 
 import java.io.ByteArrayInputStream;
 
-public final class BytesIOInputStream extends ByteArrayInputStream {
+final class BytesIOInputStream extends ByteArrayInputStream {
     public BytesIOInputStream(byte[] buf) {
         super(buf);
     }

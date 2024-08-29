@@ -14,6 +14,9 @@ import java.util.zip.CRC32;
 public final class Util {
     public static final String copyright = "Copyright © 2022-2024 Paul Tavitian";
 
+    private Util() {
+    }
+
     /**
      * @param byteArray The byte array to format as a string.
      * @return A string representation of the byte array, resembling a Python byte string.

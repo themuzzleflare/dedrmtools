@@ -7,7 +7,7 @@ package cloud.tavitian.dedrmtools;
 import java.io.File;
 import java.net.URI;
 
-public final class BookFile extends File {
+final class BookFile extends File {
     /**
      * Creates a new {@code File} instance by converting the given
      * pathname string into an abstract pathname.  If the given string is

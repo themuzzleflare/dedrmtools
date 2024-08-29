@@ -10,8 +10,11 @@ import java.security.NoSuchAlgorithmException;
 
 import static cloud.tavitian.dedrmtools.Util.md5;
 
-public final class KGenPidsUtils {
+final class KGenPidsUtils {
     public static final byte[] charMap1 = "n5Pr6St7Uv8Wx9YzAb0Cd1Ef2Gh3Jk4M".getBytes(StandardCharsets.US_ASCII);
+
+    private KGenPidsUtils() {
+    }
 
     // Encode the bytes in data using the characters in charMap
     // Both data and charMap should be byte arrays

@@ -7,7 +7,7 @@ package cloud.tavitian.dedrmtools.kfxdedrm.kfxtables;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Key27 {
+final class Key27 {
     public static final List<Integer> d0x6a0c51a8 = new ArrayList<>(List.of(0x16176a34, 0xdc0247cf, 0x726b34d1, 0xa5a9384c, 0x3274641d, 0x4a59d7b2, 0xdc060a3e, 0xd7c20c9d,
             0xe86d81f2, 0x86531598, 0x0c5d255e, 0x25e5c205, 0x63e57d18, 0x7fb49052, 0x68217bbb, 0x24630e29,
             0x0bc04b52, 0x29b8e75b, 0xc64c4554, 0xe3a98751,
@@ -622,4 +622,7 @@ public class Key27 {
             0xabeb88a2, 0x7e71e1f1, 0xe0ddd234, 0x9eac33c5,
             0x74d68e6d, 0xcce9f0c1, 0xa6ed2885, 0xb3e1d308, 0xeb493891, 0xf9ae4ba6, 0x4a05dfaf, 0x39729e79,
             0x34743e5e, 0xa106a03f, 0x67027863, 0x75af4c55, 0x5e70e61a, 0x9538d960, 0xe64f98b6, 0xd5d02e52));
+
+    private Key27() {
+    }
 }

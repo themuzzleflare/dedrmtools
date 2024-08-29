@@ -4,7 +4,7 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
-public final class SystemSymbols {
+final class SystemSymbols {
     public static final String ION = "$ion";
     public static final String ION_1_0 = "$ion_1_0";
     public static final String ION_SYMBOL_TABLE = "$ion_symbol_table";
@@ -14,4 +14,7 @@ public final class SystemSymbols {
     public static final String SYMBOLS = "symbols";
     public static final String MAX_ID = "max_id";
     public static final String ION_SHARED_SYMBOL_TABLE = "$ion_shared_symbol_table";
+
+    private SystemSymbols() {
+    }
 }

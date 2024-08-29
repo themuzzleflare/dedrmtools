@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 
 import static cloud.tavitian.dedrmtools.Util.*;
 
-public final class KindleDatabase extends LinkedHashMap<String, String> {
+final class KindleDatabase extends LinkedHashMap<String, String> {
     private static final byte[] charMap1 = "n5Pr6St7Uv8Wx9YzAb0Cd1Ef2Gh3Jk4M".getBytes(StandardCharsets.US_ASCII);
 
     private static final String kindleAccountTokensKey = "kindle.account.tokens";
@@ -115,37 +115,37 @@ public final class KindleDatabase extends LinkedHashMap<String, String> {
     }
 
     public byte[] getKindleAccountTokenBytes() {
-        Debug.log(String.format("Got Kindle Account Token: %s", getKindleAccountToken()));
+        Debug.println(String.format("Got Kindle Account Token: %s", getKindleAccountToken()));
         return hexStringToByteArray(getKindleAccountToken());
     }
 
     public byte[] getDSNBytes() {
-        Debug.log(String.format("Got DSN: %s", getDSN()));
+        Debug.println(String.format("Got DSN: %s", getDSN()));
         return hexStringToByteArray(getDSN());
     }
 
     public byte[] getMazamaRandomNumberBytes() {
-        Debug.log(String.format("Got MazamaRandomNumber: %s", getMazamaRandomNumber()));
+        Debug.println(String.format("Got MazamaRandomNumber: %s", getMazamaRandomNumber()));
         return hexStringToByteArray(getMazamaRandomNumber());
     }
 
     public byte[] getSerialNumberBytes() {
-        Debug.log(String.format("Got SerialNumber: %s", getSerialNumber()));
+        Debug.println(String.format("Got SerialNumber: %s", getSerialNumber()));
         return hexStringToByteArray(getSerialNumber());
     }
 
     public byte[] getIDStringBytes() {
-        Debug.log(String.format("Got IDString: %s", getIDString()));
+        Debug.println(String.format("Got IDString: %s", getIDString()));
         return hexStringToByteArray(getIDString());
     }
 
     public byte[] getUsernameHashBytes() {
-        Debug.log(String.format("Got UsernameHash: %s", getUsernameHash()));
+        Debug.println(String.format("Got UsernameHash: %s", getUsernameHash()));
         return hexStringToByteArray(getUsernameHash());
     }
 
     public byte[] getUserNameBytes() {
-        Debug.log(String.format("Got UserName: %s", getUserName()));
+        Debug.println(String.format("Got UserName: %s", getUserName()));
         return hexStringToByteArray(getUserName());
     }
 
@@ -213,7 +213,7 @@ public final class KindleDatabase extends LinkedHashMap<String, String> {
      */
     public byte[] genDSN() throws NoSuchAlgorithmException {
         byte[] derivedDSN = getDSNBytesOrDefault(genAltDSN());
-        Debug.log(String.format("Derived DSN: %s", formatByteArray(derivedDSN)));
+        Debug.println(String.format("Derived DSN: %s", formatByteArray(derivedDSN)));
         return derivedDSN;
     }
 

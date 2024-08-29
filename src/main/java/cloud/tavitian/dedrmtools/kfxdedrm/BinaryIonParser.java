@@ -4,8 +4,6 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
-import cloud.tavitian.dedrmtools.BytesIOInputStream;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -15,9 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static cloud.tavitian.dedrmtools.Util.*;
-import static cloud.tavitian.dedrmtools.kfxdedrm.IonConstants.*;
+import static cloud.tavitian.dedrmtools.kfxdedrm.IonUtils.*;
 
-public final class BinaryIonParser {
+final class BinaryIonParser {
     private final BytesIOInputStream stream;
     private final int initPos;
     private final List<Integer> annotations = new ArrayList<>();

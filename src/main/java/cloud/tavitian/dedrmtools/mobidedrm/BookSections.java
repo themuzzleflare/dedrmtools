@@ -6,5 +6,5 @@ package cloud.tavitian.dedrmtools.mobidedrm;
 
 import java.util.ArrayList;
 
-public final class BookSections extends ArrayList<BookSection> {
+final class BookSections extends ArrayList<BookSection> {
 }

@@ -26,7 +26,7 @@ public final class Main {
             if (args[i].equals("-k") || args[i].equals("--database")) kdatabases = commaSeparatedStringToSet(args[++i]);
             else if (args[i].equals("-p") || args[i].equals("--pid")) pids = commaSeparatedStringToSet(args[++i]);
             else if (args[i].equals("-s") || args[i].equals("--serial")) serials = commaSeparatedStringToSet(args[++i]);
-            else if (args[i].equals("-v") || args[i].equals("--verbose")) Debug.setDebug(true);
+            else if (args[i].equals("-v") || args[i].equals("--verbose")) Debug.setEnabled(true);
             else if (args[i].equals("-h") || args[i].equals("--help")) {
                 usage();
                 System.exit(0);
@@ -45,11 +45,11 @@ public final class Main {
             System.exit(1);
         }
 
-        Debug.log("infile: " + infile);
-        Debug.log("outdir: " + outdir);
-        Debug.log("kdatabases: " + kdatabases);
-        Debug.log("pids: " + pids);
-        Debug.log("serials: " + serials);
+        Debug.println("infile: " + infile);
+        Debug.println("outdir: " + outdir);
+        Debug.println("kdatabases: " + kdatabases);
+        Debug.println("pids: " + pids);
+        Debug.println("serials: " + serials);
 
         DeDRM.decryptBook(infile, outdir, kdatabases, serials, pids);
     }

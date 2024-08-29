@@ -4,7 +4,7 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
-public enum ParserState {
+enum ParserState {
     INVALID(1),
     BEFORE_FIELD(2),
     BEFORE_TID(3),

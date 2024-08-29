@@ -4,5 +4,5 @@
 
 package cloud.tavitian.dedrmtools;
 
-public record KDatabase(String dbFile, KindleDatabase kindleDatabase) {
+record KDatabase(String dbFile, KindleDatabase kindleDatabase) {
 }

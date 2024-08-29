@@ -4,6 +4,6 @@
 
 package cloud.tavitian.dedrmtools;
 
-public interface BookCleanup {
+interface BookCleanup {
     void cleanup();
 }

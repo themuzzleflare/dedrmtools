@@ -10,7 +10,7 @@ import java.util.List;
 
 import static cloud.tavitian.dedrmtools.Util.toIntegerList;
 
-public final class Workspace {
+final class Workspace {
     private List<Integer> work;
 
     public Workspace(List<Integer> initialList) {

@@ -34,6 +34,9 @@ public final class DeDRM {
     private static final byte[] topazBytes = "TPZ".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] pkBytes = {0x50, 0x4B, 0x03, 0x04};
 
+    private DeDRM() {
+    }
+
     private static String cleanupName(String name) {
         // Substitute filename unfriendly characters
         name = name.replace("<", "[")
@@ -147,7 +150,6 @@ public final class DeDRM {
                 kDatabases.add(kDatabase);
             } catch (IOException e) {
                 System.err.printf("Error getting database from file %s: %s%n", kDatabaseFile, e.getMessage());
-                e.printStackTrace();
             }
         }
 
@@ -172,7 +174,6 @@ public final class DeDRM {
             mb.cleanup();
         } catch (Exception e) {
             System.err.printf("Error decrypting book after %.1f seconds: %s%n", (System.currentTimeMillis() - startTime) / 1000.0, e.getMessage());
-            e.printStackTrace();
             throw e;
         }
     }

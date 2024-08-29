@@ -4,8 +4,6 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
-import cloud.tavitian.dedrmtools.BytesIOInputStream;
-
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
@@ -17,9 +15,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static cloud.tavitian.dedrmtools.kfxdedrm.IonConstants.*;
+import static cloud.tavitian.dedrmtools.kfxdedrm.IonUtils.*;
 
-public final class DRMIonVoucher {
+final class DRMIonVoucher {
     private static final byte[] pidv3Bytes = "PIDv3".getBytes(StandardCharsets.US_ASCII);
 
     private final BinaryIonParser envelope;

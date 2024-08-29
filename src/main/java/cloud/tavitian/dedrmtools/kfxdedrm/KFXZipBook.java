@@ -5,7 +5,6 @@
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
 import cloud.tavitian.dedrmtools.Book;
-import cloud.tavitian.dedrmtools.BytesIOInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -41,18 +40,22 @@ public final class KFXZipBook extends Book {
         this.infile = infile;
     }
 
+    @Override
     public String getBookTitle() {
         return Paths.get(infile).getFileName().toString().replaceFirst("[.][^.]+$", "");
     }
 
+    @Override
     public String getBookType() {
         return "KFX-ZIP";
     }
 
+    @Override
     public String getBookExtension() {
         return ".kfx-zip";
     }
 
+    @Override
     public void getFile(String outpath) throws IOException {
         if (decrypted.isEmpty()) Files.copy(Paths.get(infile), Paths.get(outpath));
         else {
@@ -75,6 +78,7 @@ public final class KFXZipBook extends Book {
         }
     }
 
+    @Override
     public void processBook(Set<String> pidSet) throws Exception {
         try (FileInputStream fis = new FileInputStream(infile);
              ZipInputStream zis = new ZipInputStream(fis)) {

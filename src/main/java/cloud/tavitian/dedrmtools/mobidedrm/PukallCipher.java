@@ -2,9 +2,9 @@
  * Copyright © 2024 Paul Tavitian.
  */
 
-package cloud.tavitian.dedrmtools;
+package cloud.tavitian.dedrmtools.mobidedrm;
 
-public final class PukallCipher {
+final class PukallCipher {
     private static final int KEY_LENGTH = 16;
     private static final int KEY_COMPONENTS = 8;
     private static final int BYTE_MASK = 0xFF;
@@ -12,6 +12,9 @@ public final class PukallCipher {
     private static final int MULT2 = 346;
     private static final int KEY_XOR_MULTIPLIER = 257;
     private static final int MASK16 = 0xFFFF;
+
+    private PukallCipher() {
+    }
 
     public static byte[] pc1(byte[] key, byte[] src, boolean decryption) throws Exception {
         validateKeyLength(key);

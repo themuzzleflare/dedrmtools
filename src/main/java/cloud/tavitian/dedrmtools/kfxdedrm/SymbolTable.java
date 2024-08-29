@@ -7,9 +7,9 @@ package cloud.tavitian.dedrmtools.kfxdedrm;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cloud.tavitian.dedrmtools.kfxdedrm.IonConstants.*;
+import static cloud.tavitian.dedrmtools.kfxdedrm.IonUtils.*;
 
-public final class SymbolTable {
+final class SymbolTable {
     private final List<String> table;
 
     public SymbolTable() {

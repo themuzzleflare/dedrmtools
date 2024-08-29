@@ -6,5 +6,5 @@ package cloud.tavitian.dedrmtools.kfxdedrm;
 
 import java.util.LinkedHashMap;
 
-public final class KFXDecryptedDict extends LinkedHashMap<String, byte[]> {
+final class KFXDecryptedDict extends LinkedHashMap<String, byte[]> {
 }

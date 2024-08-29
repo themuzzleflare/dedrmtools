@@ -7,7 +7,7 @@ package cloud.tavitian.dedrmtools;
 import java.io.IOException;
 import java.util.Set;
 
-public interface BookManager {
+interface BookManager {
     String getBookTitle();
 
     String getBookType();

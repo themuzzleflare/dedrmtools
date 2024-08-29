@@ -4,5 +4,5 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
-public record ObfuscationValue(int magicNumber, byte[] word) {
+record ObfuscationValue(int magicNumber, byte[] word) {
 }

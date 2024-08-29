@@ -4,5 +4,5 @@
 
 package cloud.tavitian.dedrmtools;
 
-public final class KindleKey {
+final class KindleKey {
 }

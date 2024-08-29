@@ -10,7 +10,8 @@ import java.util.Map;
 
 import static cloud.tavitian.dedrmtools.Util.formatByteArray;
 
-public final class MetaDictionary extends LinkedHashMap<Integer, byte[]> {
+final class MetaDictionary extends LinkedHashMap<Integer, byte[]> {
+    @Override
     public String toString() {
         Iterator<Map.Entry<Integer, byte[]>> i = entrySet().iterator();
 

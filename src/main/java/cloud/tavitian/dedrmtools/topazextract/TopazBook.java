@@ -15,10 +15,12 @@ public final class TopazBook extends Book {
         System.out.println("Removes DRM protection from Topaz eBooks and extracts the contents.");
     }
 
+    @Override
     public String getBookType() {
         return "Topaz";
     }
 
+    @Override
     public String getBookExtension() {
         return ".htmlz";
     }

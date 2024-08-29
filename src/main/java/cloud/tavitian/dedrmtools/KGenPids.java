@@ -16,11 +16,14 @@ import java.util.Set;
 import static cloud.tavitian.dedrmtools.Util.concatenateArrays;
 import static cloud.tavitian.dedrmtools.Util.toIntegerArray;
 
-public final class KGenPids {
+final class KGenPids {
     private static final byte[] charMap1 = "n5Pr6St7Uv8Wx9YzAb0Cd1Ef2Gh3Jk4M".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] charMap3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] charMap4 = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] asteriskBytes = "*".getBytes(StandardCharsets.US_ASCII);
+
+    private KGenPids() {
+    }
 
     private static byte[] md5(byte[]... data) throws NoSuchAlgorithmException {
         return Util.md5(data);

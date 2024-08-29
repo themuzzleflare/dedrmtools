@@ -4,5 +4,5 @@
 
 package cloud.tavitian.dedrmtools.mobidedrm;
 
-public record DRMInfo(byte[] key, String pid) {
+record DRMInfo(byte[] key, String pid) {
 }
