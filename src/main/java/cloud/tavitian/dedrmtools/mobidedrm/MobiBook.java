@@ -10,13 +10,12 @@ import cloud.tavitian.dedrmtools.PIDMetaInfo;
 import cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 import static cloud.tavitian.dedrmtools.CharMaps.*;
@@ -96,7 +95,10 @@ public final class MobiBook extends Book {
         System.out.println("Removes protection from Kindle/Mobipocket, Kindle/KF8 and Kindle/Print Replica eBooks.");
 
         // initial sanity check on file
-        dataFile = Files.readAllBytes(Paths.get(infile));
+        FileInputStream fis = new FileInputStream(infile);
+        dataFile = fis.readAllBytes();
+        fis.close();
+
         header = Arrays.copyOfRange(dataFile, 0, 78);
         magic = Arrays.copyOfRange(header, 0x3C, 0x3C + 8);
 
