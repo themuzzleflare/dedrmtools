@@ -13,14 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 final class MobiBookTest {
     @Test
-    void crc32() {
-    }
-
-    @Test
-    void checksumPid() {
-    }
-
-    @Test
     void getBookTitle() {
     }
 

@@ -6,15 +6,13 @@ package cloud.tavitian.dedrmtools.kfxdedrm;
 
 import org.tukaani.xz.LZMAInputStream;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import static cloud.tavitian.dedrmtools.CryptoUtils.aescbcdecrypt;
 import static cloud.tavitian.dedrmtools.kfxdedrm.IonUtils.*;
 
 final class DRMIon {
@@ -130,13 +128,10 @@ final class DRMIon {
         byte[] msg;
 
         if (decrypt) {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            SecretKeySpec secretKeySpec = new SecretKeySpec(Arrays.copyOfRange(key, 0, 16), "AES");
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(Arrays.copyOfRange(civ, 0, 16));
+            byte[] keyRange = Arrays.copyOfRange(key, 0, 16);
+            byte[] civRange = Arrays.copyOfRange(civ, 0, 16);
 
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
-
-            msg = cipher.doFinal(ct);
+            msg = aescbcdecrypt(keyRange, civRange, ct);
         } else msg = ct;
 
         if (!decompress) {

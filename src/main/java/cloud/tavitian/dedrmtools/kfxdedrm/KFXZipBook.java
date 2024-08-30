@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -20,14 +19,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import static cloud.tavitian.dedrmtools.CharMaps.*;
 import static cloud.tavitian.dedrmtools.Util.contains;
 
 public final class KFXZipBook extends Book {
     private static final String version = "2.0";
-
-    private static final byte[] kfxDrmIonBytes = {(byte) 0xEA, 0x44, 0x52, 0x4D, 0x49, 0x4F, 0x4E, (byte) 0xEE};
-    private static final byte[] voucherBytes = new byte[]{(byte) 0xe0, 0x01, 0x00, (byte) 0xea};
-    private static final byte[] protectedDataBytes = "ProtectedData".getBytes(StandardCharsets.US_ASCII);
 
     private final String infile;
     private final KFXDecryptedDict decrypted = new KFXDecryptedDict();

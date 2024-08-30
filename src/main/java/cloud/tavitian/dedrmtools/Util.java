@@ -4,12 +4,7 @@
 
 package cloud.tavitian.dedrmtools;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.zip.CRC32;
 
 public final class Util {
     public static final String copyright = "Copyright © 2022-2024 Paul Tavitian";
@@ -103,30 +98,6 @@ public final class Util {
         return result;
     }
 
-    public static byte[] sha256(byte[]... data) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-        for (byte[] array : data) digest.update(array);
-
-        return digest.digest();
-    }
-
-    public static byte[] md5(byte[]... data) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("MD5");
-
-        for (byte[] array : data) digest.update(array);
-
-        return digest.digest();
-    }
-
-    public static byte[] sha1(byte[]... data) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-1");
-
-        for (byte[] array : data) digest.update(array);
-
-        return digest.digest();
-    }
-
     public static int[] toIntegerArray(List<Integer> list) {
         return list.stream().mapToInt(Integer::intValue).toArray();
     }
@@ -195,38 +166,6 @@ public final class Util {
         return false;
     }
 
-    public static long crc32(byte[] data) {
-        CRC32 crc32 = new CRC32();
-
-        crc32.update(0xFF);
-        crc32.update(0xFF);
-        crc32.update(0xFF);
-        crc32.update(0xFF);
-        crc32.update(data);
-
-        return ~crc32.getValue() & 0xFFFFFFFFL;
-    }
-
-    public static byte[] checksumPid(byte[] data, byte[] charMap) throws IOException {
-        int crc = (int) crc32(data);
-
-        crc = crc ^ (crc >> 16);
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(data);
-
-        for (int i = 0; i < 2; i++) {
-            int b = crc & 0xff;
-            int pos = (b / charMap.length) ^ (b % charMap.length);
-
-            outputStream.write(charMap[pos % charMap.length]);
-
-            crc >>= 8;
-        }
-
-        return outputStream.toByteArray();
-    }
-
     public static Set<String> toSet(String string) {
         return Set.of(string);
     }
@@ -246,6 +185,16 @@ public final class Util {
         return Arrays.stream(parts).collect(LinkedHashSet::new, Set::add, Set::addAll);
     }
 
+    // Helper method to find the index of a byte in a byte array, similar to Python's find() method.
+    public static int indexOf(byte[] array, byte value) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                return i;
+            }
+        }
+        return -1; // Returns -1 if the byte is not found in the array
+    }
+
     /**
      * @param s string to print to the console. This is a helper function to avoid having to type System.out.println() every time.
      */
@@ -255,5 +204,9 @@ public final class Util {
 
     public static void printKeyVal(String key, String val) {
         System.out.printf("%s: %s%n", key, val);
+    }
+
+    public static int toInt(byte[] data) {
+        return (data[0] & 0xFF) << 24 | (data[1] & 0xFF) << 16 | (data[2] & 0xFF) << 8 | data[3] & 0xFF;
     }
 }

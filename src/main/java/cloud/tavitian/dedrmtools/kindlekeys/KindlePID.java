@@ -2,35 +2,23 @@
  * Copyright © 2024 Paul Tavitian.
  */
 
-package cloud.tavitian.dedrmtools;
+package cloud.tavitian.dedrmtools.kindlekeys;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import static cloud.tavitian.dedrmtools.CharMaps.*;
+import static cloud.tavitian.dedrmtools.HashUtils.sha1;
 import static cloud.tavitian.dedrmtools.Util.concatenateArrays;
 import static cloud.tavitian.dedrmtools.Util.toIntegerArray;
+import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.checksumPid;
+import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.crc32;
 
-final class KGenPids {
-    private static final byte[] charMap1 = "n5Pr6St7Uv8Wx9YzAb0Cd1Ef2Gh3Jk4M".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] charMap3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] charMap4 = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] asteriskBytes = "*".getBytes(StandardCharsets.US_ASCII);
-
-    private KGenPids() {
-    }
-
-    private static byte[] md5(byte[]... data) throws NoSuchAlgorithmException {
-        return Util.md5(data);
-    }
-
-    private static byte[] sha1(byte[]... data) throws NoSuchAlgorithmException {
-        return Util.sha1(data);
+public final class KindlePID {
+    private KindlePID() {
     }
 
     // Generate the encryption table used to generate the device PID
@@ -73,7 +61,7 @@ final class KGenPids {
 
         ByteArrayOutputStream pidAscii = new ByteArrayOutputStream();
 
-        // Initialize the pid array
+        // Initialise the pid array
         int[] pid = {
                 (seed >> 24) & 0xFF, (seed >> 16) & 0xFF, (seed >> 8) & 0xFF, seed & 0xFF,
                 (seed >> 24) & 0xFF, (seed >> 16) & 0xFF, (seed >> 8) & 0xFF, seed & 0xFF
@@ -119,35 +107,16 @@ final class KGenPids {
 
         for (int i = 0; i < 8; i++) {
             int sixBits = getSixBitsFromBitField(hashVal, i);
-
             outputStream.write(charMap3[sixBits]);
         }
 
         return outputStream.toByteArray();
     }
 
-    // convert from 8 digit PID to 10 digit PID with checksum
-    private static byte[] checksumPid(String data) throws IOException {
-        return checksumPid(data.getBytes(StandardCharsets.UTF_8));
-    }
-
-    // convert from 8 digit PID to 10 digit PID with checksum
-    private static byte[] checksumPid(byte[] data) throws IOException {
-        return Util.checksumPid(data, charMap4);
-    }
-
-    private static long crc32(byte[] data) {
-        return Util.crc32(data);
-    }
-
-    private static long crc32(String data) {
-        return crc32(data.getBytes(StandardCharsets.UTF_8));
-    }
-
     private static byte[] pidFromSerial(byte[] serial, int length) {
         int crc = (int) crc32(serial);
 
-        // Initialize arr1 with length l and fill with zeros
+        // Initialise arr1 with length l and fill with zeros
         int[] arr1 = new int[length];
 
         // XOR each byte of s with arr1
@@ -181,7 +150,7 @@ final class KGenPids {
     }
 
     private static Set<String> getKindlePids(byte[] rec209, byte[] token, String serialnum) throws Exception {
-        return getKindlePids(rec209, token, serialnum.getBytes(StandardCharsets.UTF_8));
+        return getKindlePids(rec209, token, serialnum.getBytes());
     }
 
     private static Set<String> getKindlePids(byte[] rec209, byte[] token, byte[] serialnum) throws Exception {
@@ -192,14 +161,14 @@ final class KGenPids {
         // Compute book PID
         byte[] bookPidHash = sha1(serialnum, rec209, token); // compute the book pid hash by calculating the sha1 of the kindle serial number, and the rec209 & token from the pid meta info of the book file
         byte[] bookPid = encodePid(bookPidHash); // encode the hash to get the pid
-        bookPid = checksumPid(bookPid); // convert the pid to a 10 digit pid with checksum
+        bookPid = checksumPid(bookPid, charMap4); // convert the pid to a 10 digit pid with checksum
         pids.add(new String(bookPid));
 
         // compute fixed pid for old pre 2.5 firmware update pid as well
         ByteArrayOutputStream kindlePidOutputStream = new ByteArrayOutputStream();
         kindlePidOutputStream.write(pidFromSerial(serialnum, 7));
         kindlePidOutputStream.write(asteriskBytes);
-        byte[] kindlePid = checksumPid(kindlePidOutputStream.toByteArray());
+        byte[] kindlePid = checksumPid(kindlePidOutputStream.toByteArray(), charMap4);
         pids.add(new String(kindlePid));
 
         return pids;
@@ -227,7 +196,7 @@ final class KGenPids {
         // Compute the device PID
         int[] table = generatePidEncryptionTable();
         byte[] devicePid = generateDevicePid(table, dsn, 4);
-        devicePid = checksumPid(devicePid);
+        devicePid = checksumPid(devicePid, charMap4);
         pids.add(new String(devicePid));
 
         // Compute book PIDs
@@ -235,19 +204,19 @@ final class KGenPids {
         // Book PID
         byte[] pidHash = sha1(dsn, kindleAccountToken, rec209, token);
         byte[] bookPid = encodePid(pidHash);
-        bookPid = checksumPid(bookPid);
+        bookPid = checksumPid(bookPid, charMap4);
         pids.add(new String(bookPid));
 
         // Variant 1
         pidHash = sha1(kindleAccountToken, rec209, token);
         bookPid = encodePid(pidHash);
-        bookPid = checksumPid(bookPid);
+        bookPid = checksumPid(bookPid, charMap4);
         pids.add(new String(bookPid));
 
         // Variant 2
         pidHash = sha1(dsn, rec209, token);
         bookPid = encodePid(pidHash);
-        bookPid = checksumPid(bookPid);
+        bookPid = checksumPid(bookPid, charMap4);
         pids.add(new String(bookPid));
 
         return pids;

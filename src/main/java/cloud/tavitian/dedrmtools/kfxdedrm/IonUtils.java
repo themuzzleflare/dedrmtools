@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static cloud.tavitian.dedrmtools.Util.sha256;
+import static cloud.tavitian.dedrmtools.HashUtils.sha256;
 import static cloud.tavitian.dedrmtools.Util.toByteArray;
 import static cloud.tavitian.dedrmtools.kfxdedrm.kfxtables.KFXTables.*;
 

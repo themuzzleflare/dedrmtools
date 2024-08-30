@@ -7,7 +7,7 @@ package cloud.tavitian.dedrmtools.mobidedrm;
 import cloud.tavitian.dedrmtools.Book;
 import cloud.tavitian.dedrmtools.Debug;
 import cloud.tavitian.dedrmtools.PIDMetaInfo;
-import cloud.tavitian.dedrmtools.Util;
+import cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -19,16 +19,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static cloud.tavitian.dedrmtools.CharMaps.*;
 import static cloud.tavitian.dedrmtools.Util.*;
 
 public final class MobiBook extends Book {
     private static final String version = "3.0";
-
-    private static final byte[] letters = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] bookmobiBytes = "BOOKMOBI".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] textreadBytes = "TEXtREAd".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] mopBytes = "%MOP".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] exthBytes = "EXTH".getBytes(StandardCharsets.US_ASCII);
 
     /**
      * The data file
@@ -224,20 +219,12 @@ public final class MobiBook extends Book {
         return pc1(key, src, true);
     }
 
-    private static long crc32(byte[] data) {
-        return Util.crc32(data);
-    }
-
-    private static long crc32(String data) {
-        return crc32(data.getBytes(StandardCharsets.UTF_8));
-    }
-
     private static String checksumPid(String data) throws IOException {
         return checksumPid(data.getBytes(StandardCharsets.UTF_8));
     }
 
     private static String checksumPid(byte[] data) throws IOException {
-        return new String(Util.checksumPid(data, letters));
+        return new String(KindleKeyUtils.checksumPid(data, letters));
     }
 
     private static int getSizeOfTrailingDataEntries(byte[] ptr, int size, int flags) {
@@ -598,7 +585,8 @@ public final class MobiBook extends Book {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        outputStream.write(Arrays.copyOfRange(dataFile, 0, sections.get(1).offset())); // Append data before the first section
+        byte[] rangeToWrite = Arrays.copyOfRange(dataFile, 0, sections.get(1).offset());
+        outputStream.write(rangeToWrite); // Append data before the first section
 
         for (int i = 1; i <= records; i++) {
             byte[] data = loadSection(i);
@@ -606,21 +594,27 @@ public final class MobiBook extends Book {
 
             if (i % 100 == 0) System.out.print(" .");
 
-            // print("record %d, extra_size %d" %(i,extra_size))
-//            System.out.println("Record " + i + ", extra size " + extraSize);
+            byte[] rangeToDecode = Arrays.copyOfRange(data, 0, data.length - extraSize);
+            byte[] decodedData = pc1(foundKey, rangeToDecode);
 
-            byte[] decodedData = pc1(foundKey, Arrays.copyOfRange(data, 0, data.length - extraSize));
-
-            if (i == 1) printReplica = Arrays.equals(Arrays.copyOfRange(decodedData, 0, 4), mopBytes);
+            if (i == 1) {
+                byte[] rangeToCheck = Arrays.copyOfRange(decodedData, 0, 4);
+                printReplica = Arrays.equals(mopBytes, rangeToCheck);
+            }
 
             outputStream.write(decodedData);
 
-            if (extraSize > 0) outputStream.write(Arrays.copyOfRange(data, data.length - extraSize, data.length));
+            if (extraSize > 0) {
+                rangeToWrite = Arrays.copyOfRange(data, data.length - extraSize, data.length);
+                outputStream.write(rangeToWrite);
+            }
         }
 
         // mobidata_list.append(self.data_file[self.sections[self.records + 1][0]:])
-        if (numSections > records + 1)
-            outputStream.write(Arrays.copyOfRange(dataFile, sections.get(records + 1).offset(), dataFile.length));
+        if (numSections > records + 1) {
+            rangeToWrite = Arrays.copyOfRange(dataFile, sections.get(records + 1).offset(), dataFile.length);
+            outputStream.write(rangeToWrite);
+        }
 
         mobiData = outputStream.toByteArray();
 

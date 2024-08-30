@@ -2,17 +2,22 @@
  * Copyright © 2024 Paul Tavitian.
  */
 
-package cloud.tavitian.dedrmtools;
+package cloud.tavitian.dedrmtools.kindlekeys;
+
+import cloud.tavitian.dedrmtools.Debug;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 
-import static cloud.tavitian.dedrmtools.Util.*;
+import static cloud.tavitian.dedrmtools.CharMaps.charMap1;
+import static cloud.tavitian.dedrmtools.HashUtils.sha1;
+import static cloud.tavitian.dedrmtools.Util.formatByteArray;
+import static cloud.tavitian.dedrmtools.Util.hexStringToByteArray;
+import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.encode;
+import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.encodeHash;
 
-final class KindleDatabase extends LinkedHashMap<String, String> {
-    private static final byte[] charMap1 = "n5Pr6St7Uv8Wx9YzAb0Cd1Ef2Gh3Jk4M".getBytes(StandardCharsets.US_ASCII);
-
+public class KindleDatabase<V> extends LinkedHashMap<String, V> {
     private static final String kindleAccountTokensKey = "kindle.account.tokens";
     private static final String dsnKey = "DSN";
     private static final String mazamaRandomNumberKey = "MazamaRandomNumber";
@@ -21,68 +26,102 @@ final class KindleDatabase extends LinkedHashMap<String, String> {
     private static final String usernameHashKey = "UsernameHash";
     private static final String userNameKey = "UserName";
 
-    private static byte[] encode(byte[] data) {
-        return KGenPidsUtils.encode(data, charMap1);
-    }
+    private static final String kindleCookieItemKey = "kindle.cookie.item";
+    private static final String eulaVersionAcceptedKey = "eulaVersionAccepted";
+    private static final String loginDateKey = "login_date";
+    private static final String kindleTokenItemKey = "kindle.token.item";
+    private static final String loginKey = "login";
+    private static final String kindleKeyItemKey = "kindle.key.item";
+    private static final String kindleNameInfoKey = "kindle.name.info";
+    private static final String kindleDeviceInfoKey = "kindle.device.info";
+    private static final String maxDateKey = "max_date";
+    private static final String sigVerifKey = "SIGVERIF";
+    private static final String buildVersionKey = "build_version";
+    private static final String kindleDirectedIDInfoKey = "kindle.directedid.info";
+    private static final String kindleAccountTypeInfoKey = "kindle.accounttype.info";
+    private static final String flashcardsPluginDataEncryptionKeyKey = "krx.flashcardsplugin.data.encryption_key";
+    private static final String notebookExportPluginDataEncryptionKeyKey = "krx.notebookexportplugin.data.encryption_key";
+    private static final String proxyHttpPasswordKey = "proxy.http.password";
+    private static final String proxyHttpUsernameKey = "proxy.http.username";
 
-    // Hash the bytes in data and then encode the digest with the characters in map
-    private static byte[] encodeHash(byte[] data) throws NoSuchAlgorithmException {
-        return encode(md5(data));
-    }
+    public static byte[][] keyBytesList = new byte[][]{
+            kindleAccountTokensKey.getBytes(StandardCharsets.US_ASCII),
+            kindleCookieItemKey.getBytes(StandardCharsets.US_ASCII),
+            eulaVersionAcceptedKey.getBytes(StandardCharsets.US_ASCII),
+            loginDateKey.getBytes(StandardCharsets.US_ASCII),
+            kindleTokenItemKey.getBytes(StandardCharsets.US_ASCII),
+            loginKey.getBytes(StandardCharsets.US_ASCII),
+            kindleKeyItemKey.getBytes(StandardCharsets.US_ASCII),
+            kindleNameInfoKey.getBytes(StandardCharsets.US_ASCII),
+            kindleDeviceInfoKey.getBytes(StandardCharsets.US_ASCII),
+            mazamaRandomNumberKey.getBytes(StandardCharsets.US_ASCII),
+            maxDateKey.getBytes(StandardCharsets.US_ASCII),
+            sigVerifKey.getBytes(StandardCharsets.US_ASCII),
+            buildVersionKey.getBytes(StandardCharsets.US_ASCII),
+            serialNumberKey.getBytes(StandardCharsets.US_ASCII),
+            usernameHashKey.getBytes(StandardCharsets.US_ASCII),
+            kindleDirectedIDInfoKey.getBytes(StandardCharsets.US_ASCII),
+            dsnKey.getBytes(StandardCharsets.US_ASCII),
+            kindleAccountTypeInfoKey.getBytes(StandardCharsets.US_ASCII),
+            flashcardsPluginDataEncryptionKeyKey.getBytes(StandardCharsets.US_ASCII),
+            notebookExportPluginDataEncryptionKeyKey.getBytes(StandardCharsets.US_ASCII),
+            proxyHttpPasswordKey.getBytes(StandardCharsets.US_ASCII),
+            proxyHttpUsernameKey.getBytes(StandardCharsets.US_ASCII)
+    };
 
-    public String getKindleAccountToken() {
+    public V getKindleAccountToken() {
         return get(kindleAccountTokensKey);
     }
 
-    public String getDSN() {
+    public V getDSN() {
         return get(dsnKey);
     }
 
-    public String getMazamaRandomNumber() {
+    public V getMazamaRandomNumber() {
         return get(mazamaRandomNumberKey);
     }
 
-    public String getSerialNumber() {
+    public V getSerialNumber() {
         return get(serialNumberKey);
     }
 
-    public String getIDString() {
+    public V getIDString() {
         return get(idStringKey);
     }
 
-    public String getUsernameHash() {
+    public V getUsernameHash() {
         return get(usernameHashKey);
     }
 
-    public String getUserName() {
+    public V getUserName() {
         return get(userNameKey);
     }
 
-    public String getKindleAccountTokenOrDefault(String defaultValue) {
+    public V getKindleAccountTokenOrDefault(V defaultValue) {
         return getOrDefault(kindleAccountTokensKey, defaultValue);
     }
 
-    public String getDSNOrDefault(String defaultValue) {
+    public V getDSNOrDefault(V defaultValue) {
         return getOrDefault(dsnKey, defaultValue);
     }
 
-    public String getMazamaRandomNumberOrDefault(String defaultValue) {
+    public V getMazamaRandomNumberOrDefault(V defaultValue) {
         return getOrDefault(mazamaRandomNumberKey, defaultValue);
     }
 
-    public String getSerialNumberOrDefault(String defaultValue) {
+    public V getSerialNumberOrDefault(V defaultValue) {
         return getOrDefault(serialNumberKey, defaultValue);
     }
 
-    public String getIDStringOrDefault(String defaultValue) {
+    public V getIDStringOrDefault(V defaultValue) {
         return getOrDefault(idStringKey, defaultValue);
     }
 
-    public String getUsernameHashOrDefault(String defaultValue) {
+    public V getUsernameHashOrDefault(V defaultValue) {
         return getOrDefault(usernameHashKey, defaultValue);
     }
 
-    public String getUserNameOrDefault(String defaultValue) {
+    public V getUserNameOrDefault(V defaultValue) {
         return getOrDefault(userNameKey, defaultValue);
     }
 
@@ -116,37 +155,79 @@ final class KindleDatabase extends LinkedHashMap<String, String> {
 
     public byte[] getKindleAccountTokenBytes() {
         Debug.println(String.format("Got Kindle Account Token: %s", getKindleAccountToken()));
-        return hexStringToByteArray(getKindleAccountToken());
+
+        V token = getKindleAccountToken();
+
+        if (token instanceof String string) return hexStringToByteArray(string);
+        else if (token instanceof byte[] bytes) return bytes;
+
+        return null;
     }
 
     public byte[] getDSNBytes() {
         Debug.println(String.format("Got DSN: %s", getDSN()));
-        return hexStringToByteArray(getDSN());
+
+        V dsn = getDSN();
+
+        if (dsn instanceof String string) return hexStringToByteArray(string);
+        else if (dsn instanceof byte[] bytes) return bytes;
+
+        return null;
     }
 
     public byte[] getMazamaRandomNumberBytes() {
         Debug.println(String.format("Got MazamaRandomNumber: %s", getMazamaRandomNumber()));
-        return hexStringToByteArray(getMazamaRandomNumber());
+
+        V mazamaRandomNumber = getMazamaRandomNumber();
+
+        if (mazamaRandomNumber instanceof String string) return hexStringToByteArray(string);
+        else if (mazamaRandomNumber instanceof byte[] bytes) return bytes;
+
+        return null;
     }
 
     public byte[] getSerialNumberBytes() {
         Debug.println(String.format("Got SerialNumber: %s", getSerialNumber()));
-        return hexStringToByteArray(getSerialNumber());
+
+        V serialNumber = getSerialNumber();
+
+        if (serialNumber instanceof String string) return hexStringToByteArray(string);
+        else if (serialNumber instanceof byte[] bytes) return bytes;
+
+        return null;
     }
 
     public byte[] getIDStringBytes() {
         Debug.println(String.format("Got IDString: %s", getIDString()));
-        return hexStringToByteArray(getIDString());
+
+        V idString = getIDString();
+
+        if (idString instanceof String string) return hexStringToByteArray(string);
+        else if (idString instanceof byte[] bytes) return bytes;
+
+        return null;
     }
 
     public byte[] getUsernameHashBytes() {
         Debug.println(String.format("Got UsernameHash: %s", getUsernameHash()));
-        return hexStringToByteArray(getUsernameHash());
+
+        V usernameHash = getUsernameHash();
+
+        if (usernameHash instanceof String string) return hexStringToByteArray(string);
+        else if (usernameHash instanceof byte[] bytes) return bytes;
+
+        return null;
     }
 
     public byte[] getUserNameBytes() {
         Debug.println(String.format("Got UserName: %s", getUserName()));
-        return hexStringToByteArray(getUserName());
+
+        V userName = getUserName();
+
+        if (userName instanceof String string) return hexStringToByteArray(string);
+        else if (userName instanceof byte[] bytes) return bytes;
+
+        return null;
     }
 
     public byte[] getKindleAccountTokenBytesOrDefault(byte[] defaultValue) {
@@ -196,7 +277,7 @@ final class KindleDatabase extends LinkedHashMap<String, String> {
      * @throws NoSuchAlgorithmException If the MD5 algorithm is not available.
      */
     public byte[] genEncodedIdString() throws NoSuchAlgorithmException {
-        return encodeHash(genIdString());
+        return encodeHash(genIdString(), charMap1);
     }
 
     /**
@@ -204,7 +285,7 @@ final class KindleDatabase extends LinkedHashMap<String, String> {
      * @throws NoSuchAlgorithmException If the MD5 algorithm is not available.
      */
     public byte[] genEncodedUsername() throws NoSuchAlgorithmException {
-        return getUsernameHashBytesOrDefault(encodeHash(getUserNameBytes()));
+        return getUsernameHashBytesOrDefault(encodeHash(getUserNameBytes(), charMap1));
     }
 
     /**
@@ -222,6 +303,6 @@ final class KindleDatabase extends LinkedHashMap<String, String> {
      * @throws NoSuchAlgorithmException If the SHA-1 algorithm is not available.
      */
     private byte[] genAltDSN() throws NoSuchAlgorithmException {
-        return encode(sha1(getMazamaRandomNumberBytes(), genEncodedIdString(), genEncodedUsername()));
+        return encode(sha1(getMazamaRandomNumberBytes(), genEncodedIdString(), genEncodedUsername()), charMap1);
     }
 }

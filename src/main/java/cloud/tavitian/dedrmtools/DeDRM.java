@@ -5,6 +5,9 @@
 package cloud.tavitian.dedrmtools;
 
 import cloud.tavitian.dedrmtools.kfxdedrm.KFXZipBook;
+import cloud.tavitian.dedrmtools.kindlekeys.KDatabase;
+import cloud.tavitian.dedrmtools.kindlekeys.KindleDatabase;
+import cloud.tavitian.dedrmtools.kindlekeys.KindleDatabaseStringValues;
 import cloud.tavitian.dedrmtools.mobidedrm.MobiBook;
 import cloud.tavitian.dedrmtools.topazextract.TopazBook;
 import com.google.gson.Gson;
@@ -13,7 +16,6 @@ import org.apache.commons.text.StringEscapeUtils;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,17 +24,15 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static cloud.tavitian.dedrmtools.CharMaps.*;
 import static cloud.tavitian.dedrmtools.Util.commaSeparatedStringToSet;
 import static cloud.tavitian.dedrmtools.Util.copyright;
+import static cloud.tavitian.dedrmtools.kindlekeys.KindlePID.getPidSet;
 
 public final class DeDRM {
     private static final String version = "2.0";
 
     private static final Gson gson = new Gson();
-
-    private static final byte[] kfxDrmIonBytes = {(byte) 0xEA, 0x44, 0x52, 0x4D, 0x49, 0x4F, 0x4E, (byte) 0xEE};
-    private static final byte[] topazBytes = "TPZ".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] pkBytes = {0x50, 0x4B, 0x03, 0x04};
 
     private DeDRM() {
     }
@@ -145,7 +145,7 @@ public final class DeDRM {
 
         for (String kDatabaseFile : kDatabaseFiles) {
             try (FileReader reader = new FileReader(kDatabaseFile)) {
-                KindleDatabase kindleDatabase = gson.fromJson(reader, KindleDatabase.class);
+                KindleDatabase<String> kindleDatabase = gson.fromJson(reader, KindleDatabaseStringValues.class);
                 KDatabase kDatabase = new KDatabase(kDatabaseFile, kindleDatabase);
                 kDatabases.add(kDatabase);
             } catch (IOException e) {
@@ -217,7 +217,7 @@ public final class DeDRM {
         byte[] rec209 = pidMetaInfo.rec209();
         byte[] token = pidMetaInfo.token();
 
-        totalPids.addAll(KGenPids.getPidSet(rec209, token, serials, kDatabases));
+        totalPids.addAll(getPidSet(rec209, token, serials, kDatabases));
 
         System.out.printf("Found %d keys to try after %.1f seconds%n", totalPids.size(), (System.currentTimeMillis() - startTime) / 1000.0);
 

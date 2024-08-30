@@ -7,13 +7,10 @@ package cloud.tavitian.dedrmtools;
 import java.io.IOException;
 import java.util.Set;
 
-import static cloud.tavitian.dedrmtools.Util.*;
+import static cloud.tavitian.dedrmtools.Util.commaSeparatedStringToSet;
+import static cloud.tavitian.dedrmtools.Util.toSet;
 
 public abstract class Book implements BookManager, BookCleanup {
-    public Book() {
-        System.out.println(copyright);
-    }
-
     public PIDMetaInfo getPidMetaInfo() {
         return new PIDMetaInfo(null, null);
     }

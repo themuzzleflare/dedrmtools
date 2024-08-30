@@ -4,10 +4,6 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -15,11 +11,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static cloud.tavitian.dedrmtools.CharMaps.pidv3Bytes;
+import static cloud.tavitian.dedrmtools.CryptoUtils.aescbcdecrypt;
+import static cloud.tavitian.dedrmtools.CryptoUtils.hmacsha256;
 import static cloud.tavitian.dedrmtools.kfxdedrm.IonUtils.*;
 
 final class DRMIonVoucher {
-    private static final byte[] pidv3Bytes = "PIDv3".getBytes(StandardCharsets.US_ASCII);
-
     private final BinaryIonParser envelope;
     private final List<String> lockParams = new ArrayList<>();
     private final byte[] dsn;
@@ -100,20 +97,8 @@ final class DRMIonVoucher {
             try {
                 // Generate the key using HMAC-SHA256
                 // Step 1: HMAC-SHA256 to generate the key
-                Mac hmacSha256 = Mac.getInstance("HmacSHA256");
-                SecretKeySpec secretKey = new SecretKeySpec(sharedSecret, "HmacSHA256");
-                hmacSha256.init(secretKey);
-                byte[] key = hmacSha256.doFinal(pidv3Bytes);
-
-                // Step 2: Use first 32 bytes of the key and initialize AES in CBC mode
-                SecretKeySpec aesKey = new SecretKeySpec(Arrays.copyOfRange(key, 0, 32), "AES");
-                IvParameterSpec ivSpec = new IvParameterSpec(Arrays.copyOfRange(cipherIv, 0, 16));
-
-                Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                aesCipher.init(Cipher.DECRYPT_MODE, aesKey, ivSpec);
-
-                // Decrypt the ciphertext
-                byte[] decryptedData = aesCipher.doFinal(cipherText);
+                byte[] key = hmacsha256(sharedSecret, pidv3Bytes);
+                byte[] decryptedData = aescbcdecrypt(Arrays.copyOfRange(key, 0, 32), Arrays.copyOfRange(cipherIv, 0, 16), cipherText);
 
                 // Parse the decrypted data as a BinaryIonParser
                 drmKey = new BinaryIonParser(new BytesIOInputStream(decryptedData));
