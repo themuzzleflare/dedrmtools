@@ -205,8 +205,4 @@ public final class Util {
     public static void printKeyVal(String key, String val) {
         System.out.printf("%s: %s%n", key, val);
     }
-
-    public static int toInt(byte[] data) {
-        return (data[0] & 0xFF) << 24 | (data[1] & 0xFF) << 16 | (data[2] & 0xFF) << 8 | data[3] & 0xFF;
-    }
 }

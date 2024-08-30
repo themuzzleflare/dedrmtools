@@ -96,10 +96,6 @@ final class UtilTest {
     }
 
     @Test
-    void checksumPid() {
-    }
-
-    @Test
     void toSet() {
         for (int i = 0; i < 1000; i++) {
             Set<String> expectedSet1 = new LinkedHashSet<>() {{

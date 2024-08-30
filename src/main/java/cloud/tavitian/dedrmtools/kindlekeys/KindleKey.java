@@ -27,7 +27,7 @@ public abstract class KindleKey implements KindleKeyManager {
     public static KindleKey getInstance() {
         if (osName.startsWith("win")) return new KindleKeyWindows();
         else if (osName.startsWith("mac") || osName.startsWith("darwin")) return new KindleKeyMacOS();
-        else return null;
+        else throw new UnsupportedOperationException("Unsupported operating system: " + osName);
     }
 
     // Method to decrypt the encrypted data using a derived key and IV
@@ -112,8 +112,8 @@ public abstract class KindleKey implements KindleKeyManager {
         return keys;
     }
 
-    public void getKey(String outpath) {
-        getKey(outpath, null);
+    public boolean getKey(String outpath) {
+        return getKey(outpath, null);
     }
 
     public boolean getKey(String outpath, List<String> files) {
