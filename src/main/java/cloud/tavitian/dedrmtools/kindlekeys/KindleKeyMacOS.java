@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static cloud.tavitian.dedrmtools.CharMaps.*;
+import static cloud.tavitian.dedrmtools.CharMaps.charMap1;
+import static cloud.tavitian.dedrmtools.CharMaps.testMap8;
 import static cloud.tavitian.dedrmtools.CryptoUtils.aesctrdecrypt;
 import static cloud.tavitian.dedrmtools.CryptoUtils.pbkdf2hmacsha1;
 import static cloud.tavitian.dedrmtools.HashUtils.sha256;
