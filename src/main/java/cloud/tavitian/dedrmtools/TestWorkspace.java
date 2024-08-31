@@ -8,7 +8,8 @@ import cloud.tavitian.dedrmtools.kindlekeys.KindleKey;
 
 public class TestWorkspace {
     public static void main(String[] args) {
+        Debug.enable();
         KindleKey kindleKey = KindleKey.getInstance();
-        kindleKey.getKey("/Users/paultavitian");
+        kindleKey.getKey("C:\\Users\\paultavitian\\Downloads");
     }
 }

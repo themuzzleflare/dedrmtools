@@ -26,6 +26,9 @@ import static cloud.tavitian.dedrmtools.Util.formatByteArray;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.*;
 
 final class KindleKeyMacOS extends KindleKey {
+    private static final byte[] charMap2 = "ZB0bYyc1xDdW2wEV3Ff7KkPpL8UuGA4gz-Tme9Nn_tHh5SvXCsIiR6rJjQaqlOoM".getBytes(StandardCharsets.US_ASCII);
+    private static final byte[] charMap5 = charMap2;
+
     private static List<byte[]> getMacAddressesMunged() {
         List<byte[]> macNums = new ArrayList<>();
 
