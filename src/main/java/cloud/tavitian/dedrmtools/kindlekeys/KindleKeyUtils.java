@@ -60,7 +60,7 @@ public final class KindleKeyUtils {
         return result;
     }
 
-    public static long crc32(byte[] data) {
+    static long crc32(byte[] data) {
         CRC32 crc32 = new CRC32();
 
         crc32.update(0xFF);
@@ -70,6 +70,10 @@ public final class KindleKeyUtils {
         crc32.update(data);
 
         return ~crc32.getValue() & 0xFFFFFFFFL;
+    }
+
+    public static String checksumPid(String data, byte[] charMap) throws IOException {
+        return new String(checksumPid(data.getBytes(), charMap));
     }
 
     public static byte[] checksumPid(byte[] data, byte[] charMap) throws IOException {

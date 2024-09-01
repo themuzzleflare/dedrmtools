@@ -195,8 +195,7 @@ final class KindleKeyMacOS extends KindleKey {
         return uuids;
     }
 
-    @Override
-    public List<byte[]> getIdStrings() {
+    private static List<byte[]> getIdStrings() {
         // Return all possible ID Strings
         List<byte[]> strings = new ArrayList<>();
 
@@ -246,7 +245,7 @@ final class KindleKeyMacOS extends KindleKey {
 
             if (file.exists()) {
                 kInfoFiles.add(testPath);
-                System.out.println("Found Kindle info file: " + testPath);
+                System.out.printf("Found Kindle info file: %s%n", testPath);
                 found = true;
             }
         }
@@ -272,7 +271,7 @@ final class KindleKeyMacOS extends KindleKey {
 
         byte[] data = Arrays.copyOf(fileData, fileData.length - 1);
 
-        String[] items = new String(data).split("/");
+        List<String> items;
 
         List<byte[]> idStrings = getIdStrings();
 
@@ -285,10 +284,10 @@ final class KindleKeyMacOS extends KindleKey {
 
             try {
                 db.clear();
-                List<String> itemList = new ArrayList<>(Arrays.asList(items));
+                items = new ArrayList<>(Arrays.asList(new String(data).split("/")));
 
                 // Extract headerblob
-                String headerblob = itemList.removeFirst();
+                String headerblob = items.removeFirst();
                 byte[] encryptedValue = decode(headerblob.getBytes(), charMap1);
                 byte[] cleartext = unprotectHeaderData(encryptedValue);
 
@@ -310,43 +309,47 @@ final class KindleKeyMacOS extends KindleKey {
                 byte[] key = null;
 
                 if (version == 5) {
+                    // .kinf2011: identical to K4PC, except the build number gets multiplied
                     Debug.println("version 5");
-                    // Handle version 5
+
                     byte[] entropy = (0x2df * Integer.parseInt(build) + guid).getBytes(StandardCharsets.UTF_8);
                     cud = new CryptUnprotectData(entropy, idString);
                 } else if (version == 6) {
+                    // .kinf2018: identical to K4PC
                     Debug.println("version 6");
-                    // Handle version 6
+
                     byte[] salt = (0x6d8 * Integer.parseInt(build) + guid).getBytes(StandardCharsets.UTF_8);
                     byte[] sp = concatenateArrays(getUsername(), "+@#$%+".getBytes(StandardCharsets.UTF_8), idString);
                     byte[] passwd = encode(sha256(sp), charMap5);
+
                     key = Arrays.copyOfRange(pbkdf2hmacsha1(passwd, salt, 10000, 0x400), 0, 32);
 
-                    Debug.println("salt: " + formatByteArray(salt));
-                    Debug.println("sp: " + formatByteArray(sp));
-                    Debug.println("passwd: " + formatByteArray(passwd));
-                    Debug.println("key: " + formatByteArray(key));
+                    Debug.printf("salt: %s%n", formatByteArray(salt));
+                    Debug.printf("sp: %s%n", formatByteArray(sp));
+                    Debug.printf("passwd: %s%n", formatByteArray(passwd));
+                    Debug.printf("key: %s%n", formatByteArray(key));
                 }
 
                 // Process each item
-                while (!itemList.isEmpty()) {
-                    String item = itemList.removeFirst();
+                while (!items.isEmpty()) {
+                    String item = items.removeFirst();
+
                     byte[] keyHash = item.substring(0, 32).getBytes(StandardCharsets.UTF_8);
                     byte[] srcnt = decode(item.substring(34).getBytes(), charMap5);
 
-                    int recordCount = Integer.parseInt(new String(srcnt));
+                    int rcnt = Integer.parseInt(new String(srcnt));
 
-                    Debug.println("keyHash: " + formatByteArray(keyHash));
-                    Debug.println("srcnt: " + formatByteArray(srcnt));
-                    Debug.println("recordCount: " + recordCount);
+                    Debug.printf("keyHash: %s%n", formatByteArray(keyHash));
+                    Debug.printf("srcnt: %s%n", formatByteArray(srcnt));
+                    Debug.printf("rcnt: %d%n", rcnt);
 
-                    List<byte[]> edlst = new ArrayList<>();
-                    for (int i = 0; i < recordCount; i++) {
-                        String record = itemList.removeFirst();
-                        edlst.add(record.getBytes(StandardCharsets.UTF_8));
+                    ByteArrayOutputStream edlst = new ByteArrayOutputStream();
+
+                    for (int i = 0; i < rcnt; i++) {
+                        String record = items.removeFirst();
+                        edlst.write(record.getBytes(StandardCharsets.UTF_8));
                     }
 
-                    // Process and store the clearText data
                     String keyName = "unknown";
                     for (byte[] name : KindleDatabase.keyBytesList) {
                         if (Arrays.equals(encodeHash(name, testMap8), keyHash)) {
@@ -357,25 +360,25 @@ final class KindleKeyMacOS extends KindleKey {
 
                     if (keyName.equals("unknown")) keyName = new String(keyHash);
 
-                    // Decode the data
-                    byte[] encdata = concatenateArrays(edlst.toArray(new byte[0][]));
+                    byte[] encdata = edlst.toByteArray();
 
-                    Debug.println("encdata: " + formatByteArray(encdata));
+                    Debug.printf("encdata: %s%n", formatByteArray(encdata));
 
                     int noffset = encdata.length - primes(encdata.length / 3).getLast();
                     byte[] pfx = Arrays.copyOfRange(encdata, 0, noffset);
                     byte[] suffix = Arrays.copyOfRange(encdata, noffset, encdata.length);
+
                     encdata = concatenateArrays(suffix, pfx);
 
-                    Debug.println("encdata: " + formatByteArray(encdata));
+                    Debug.printf("encdata: %s%n", formatByteArray(encdata));
 
                     byte[] clearText = null;
 
                     if (version == 5) {
                         Debug.println("version 5");
 
-                        byte[] decryptedValue = decode(encdata, testMap8);
-                        clearText = cud.decrypt(decryptedValue);
+                        encryptedValue = decode(encdata, testMap8);
+                        clearText = cud.decrypt(encryptedValue);
                     } else if (version == 6) {
                         Debug.println("version 6");
 
@@ -383,15 +386,17 @@ final class KindleKeyMacOS extends KindleKey {
                         byte[] iv = concatenateArrays(Arrays.copyOfRange(ivCiphertext, 0, 12), new byte[]{0x00, 0x00, 0x00, 0x02});
                         byte[] ciphertext = Arrays.copyOfRange(ivCiphertext, 12, ivCiphertext.length);
 
-                        Debug.println("ivCiphertext: " + formatByteArray(ivCiphertext));
-                        Debug.println("iv: " + formatByteArray(iv));
-                        Debug.println("ciphertext: " + formatByteArray(ciphertext));
+                        Debug.printf("ivCiphertext: %s%n", formatByteArray(ivCiphertext));
+                        Debug.printf("iv: %s%n", formatByteArray(iv));
+                        Debug.printf("ciphertext: %s%n", formatByteArray(ciphertext));
 
                         byte[] decrypted = aesctrdecrypt(key, iv, ciphertext);
 
+                        Debug.printf("decrypted: %s%n", formatByteArray(decrypted));
+
                         clearText = decode(decrypted, charMap5);
 
-                        Debug.println("clearText: " + formatByteArray(clearText));
+                        Debug.printf("clearText: %s%n", formatByteArray(clearText));
                     }
 
                     if (clearText != null && clearText.length > 0) db.put(keyName, clearText);
@@ -408,12 +413,14 @@ final class KindleKeyMacOS extends KindleKey {
         }
 
         if (foundIdString != null) {
-            System.out.printf("Decrypted key file using IDString '%s' and UserName '%s'%n", new String(foundIdString), new String(getUsername()));
             db.put("IDString", foundIdString);
             db.put("UserName", getUsername());
+
+            System.out.printf("Decrypted key file using IDString '%s' and UserName '%s'%n", new String(foundIdString), new String(getUsername()));
         } else {
-            System.out.println("Couldn't decrypt file.");
             db.clear();
+
+            System.out.println("Couldn't decrypt file.");
         }
 
         return db;

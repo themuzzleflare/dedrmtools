@@ -31,7 +31,7 @@ public abstract class KindleKey implements KindleKeyManager {
     }
 
     // Method to decrypt the encrypted data using a derived key and IV
-    public static byte[] unprotectHeaderData(byte[] encryptedData) throws Exception {
+    static byte[] unprotectHeaderData(byte[] encryptedData) throws Exception {
         Debug.println("Encrypted data: " + formatByteArray(encryptedData));
 
         char[] passwdData = "header_key_data".toCharArray(); // Password equivalent
@@ -42,7 +42,7 @@ public abstract class KindleKey implements KindleKeyManager {
 
         byte[] keyIv = pbkdf2hmacsha1(passwdData, salt, iterationCount, keyLength);
 
-        Debug.println("Derived key: " + formatByteArray(keyIv));
+        Debug.printf("Derived key: %s%n", formatByteArray(keyIv));
 
         // Extract the AES key and IV from the derived key material
         byte[] key = Arrays.copyOfRange(keyIv, 0, 32); // First 32 bytes for AES key
@@ -51,7 +51,7 @@ public abstract class KindleKey implements KindleKeyManager {
         // Decrypt the data
         byte[] decryptedData = aescbcdecrypt(key, iv, encryptedData);
 
-        Debug.println("Decrypted data: " + formatByteArray(decryptedData));
+        Debug.printf("Decrypted data: %s%n", formatByteArray(decryptedData));
 
         return decryptedData;
     }

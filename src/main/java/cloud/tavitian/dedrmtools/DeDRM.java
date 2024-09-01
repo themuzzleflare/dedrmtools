@@ -8,6 +8,7 @@ import cloud.tavitian.dedrmtools.kfxdedrm.KFXZipBook;
 import cloud.tavitian.dedrmtools.kindlekeys.KDatabase;
 import cloud.tavitian.dedrmtools.kindlekeys.KindleDatabase;
 import cloud.tavitian.dedrmtools.kindlekeys.KindleDatabaseStringValues;
+import cloud.tavitian.dedrmtools.kindlekeys.KindleKey;
 import cloud.tavitian.dedrmtools.mobidedrm.MobiBook;
 import cloud.tavitian.dedrmtools.topazextract.TopazBook;
 import com.google.gson.Gson;
@@ -231,6 +232,11 @@ public final class DeDRM {
         System.out.printf("Decryption succeeded after %.1f seconds%n", (System.currentTimeMillis() - startTime) / 1000.0);
 
         return book;
+    }
+
+    public static boolean generateKeyfile(String outpath) {
+        KindleKey instance = KindleKey.getInstance();
+        return instance.getKey(outpath);
     }
 
     public static void decryptBook(String infile, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {

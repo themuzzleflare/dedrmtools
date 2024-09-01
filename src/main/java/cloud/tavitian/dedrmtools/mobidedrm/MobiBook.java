@@ -7,7 +7,6 @@ package cloud.tavitian.dedrmtools.mobidedrm;
 import cloud.tavitian.dedrmtools.Book;
 import cloud.tavitian.dedrmtools.Debug;
 import cloud.tavitian.dedrmtools.PIDMetaInfo;
-import cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -20,6 +19,7 @@ import java.util.*;
 
 import static cloud.tavitian.dedrmtools.CharMaps.*;
 import static cloud.tavitian.dedrmtools.Util.*;
+import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.checksumPid;
 
 public final class MobiBook extends Book {
     private static final String version = "3.0";
@@ -150,9 +150,7 @@ public final class MobiBook extends Book {
         mobiCodepage = ByteBuffer.wrap(sect, 0x1c, 4).getInt();
         mobiVersion = ByteBuffer.wrap(sect, 0x68, 4).getInt();
 
-        if (mobiLength >= 0xE4 && mobiVersion >= 5) {
-            extraDataFlags = ByteBuffer.wrap(sect, 0xF2, 2).getShort();
-        }
+        if (mobiLength >= 0xE4 && mobiVersion >= 5) extraDataFlags = ByteBuffer.wrap(sect, 0xF2, 2).getShort();
 
         // multibyte utf8 data is included in the encryption for PalmDoc compression so clear that byte so that we leave it to be decrypted.
         if (compression != 17480) extraDataFlags &= 0xFFFE;
@@ -219,14 +217,6 @@ public final class MobiBook extends Book {
 
     private static byte[] pc1(byte[] key, byte[] src) throws Exception {
         return pc1(key, src, true);
-    }
-
-    private static String checksumPid(String data) throws IOException {
-        return checksumPid(data.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private static String checksumPid(byte[] data) throws IOException {
-        return new String(KindleKeyUtils.checksumPid(data, letters));
     }
 
     private static int getSizeOfTrailingDataEntries(byte[] ptr, int size, int flags) {
@@ -576,7 +566,7 @@ public final class MobiBook extends Book {
         }
 
         if (pid.equals("00000000")) System.out.println("File has default encryption, no specific key needed.");
-        else System.out.printf("File is encoded with PID %s.%n", checksumPid(pid));
+        else System.out.printf("File is encoded with PID %s.%n", checksumPid(pid, letters));
 
         // Clear the crypto type
         // self.patch_section(0, b'\0' * 2, 0xC)
@@ -630,8 +620,8 @@ public final class MobiBook extends Book {
             if (pid.length() == 10) {
                 String substring = pid.substring(0, 8);
 
-                if (!checksumPid(substring).equals(pid))
-                    System.out.printf("Warning: PID %s has an incorrect checksum, should have been %s%n", pid, checksumPid(substring));
+                if (!checksumPid(substring, letters).equals(pid))
+                    System.out.printf("Warning: PID %s has an incorrect checksum, should have been %s%n", pid, checksumPid(substring, letters));
 
                 goodPids.add(substring);
             } else if (pid.length() == 8) goodPids.add(pid);

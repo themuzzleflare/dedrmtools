@@ -154,7 +154,7 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
     }
 
     public byte[] getKindleAccountTokenBytes() {
-        Debug.println(String.format("Got Kindle Account Token: %s", getKindleAccountToken()));
+        Debug.printf("Got Kindle Account Token: %s%n", getKindleAccountToken());
 
         V token = getKindleAccountToken();
 
@@ -165,7 +165,7 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
     }
 
     public byte[] getDSNBytes() {
-        Debug.println(String.format("Got DSN: %s", getDSN()));
+        Debug.printf("Got DSN: %s%n", getDSN());
 
         V dsn = getDSN();
 
@@ -176,7 +176,7 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
     }
 
     public byte[] getMazamaRandomNumberBytes() {
-        Debug.println(String.format("Got MazamaRandomNumber: %s", getMazamaRandomNumber()));
+        Debug.printf("Got MazamaRandomNumber: %s%n", getMazamaRandomNumber());
 
         V mazamaRandomNumber = getMazamaRandomNumber();
 
@@ -187,7 +187,7 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
     }
 
     public byte[] getSerialNumberBytes() {
-        Debug.println(String.format("Got SerialNumber: %s", getSerialNumber()));
+        Debug.printf("Got SerialNumber: %s%n", getSerialNumber());
 
         V serialNumber = getSerialNumber();
 
@@ -198,7 +198,7 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
     }
 
     public byte[] getIDStringBytes() {
-        Debug.println(String.format("Got IDString: %s", getIDString()));
+        Debug.printf("Got IDString: %s%n", getIDString());
 
         V idString = getIDString();
 
@@ -209,7 +209,7 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
     }
 
     public byte[] getUsernameHashBytes() {
-        Debug.println(String.format("Got UsernameHash: %s", getUsernameHash()));
+        Debug.printf("Got UsernameHash: %s%n", getUsernameHash());
 
         V usernameHash = getUsernameHash();
 
@@ -220,7 +220,7 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
     }
 
     public byte[] getUserNameBytes() {
-        Debug.println(String.format("Got UserName: %s", getUserName()));
+        Debug.printf("Got UserName: %s%n", getUserName());
 
         V userName = getUserName();
 
@@ -294,7 +294,7 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
      */
     public byte[] genDSN() throws NoSuchAlgorithmException {
         byte[] derivedDSN = getDSNBytesOrDefault(genAltDSN());
-        Debug.println(String.format("Derived DSN: %s", formatByteArray(derivedDSN)));
+        Debug.printf("Derived DSN: %s%n", formatByteArray(derivedDSN));
         return derivedDSN;
     }
 

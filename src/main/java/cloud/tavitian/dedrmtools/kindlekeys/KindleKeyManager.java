@@ -7,8 +7,6 @@ package cloud.tavitian.dedrmtools.kindlekeys;
 import java.util.List;
 
 interface KindleKeyManager {
-    List<byte[]> getIdStrings();
-
     byte[] getUsername();
 
     List<String> getKindleInfoFiles();

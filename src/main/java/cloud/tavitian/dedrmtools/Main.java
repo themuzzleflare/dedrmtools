@@ -45,11 +45,11 @@ public final class Main {
             System.exit(1);
         }
 
-        Debug.println("infile: " + infile);
-        Debug.println("outdir: " + outdir);
-        Debug.println("kdatabases: " + kdatabases);
-        Debug.println("pids: " + pids);
-        Debug.println("serials: " + serials);
+        Debug.printf("infile: %s%n", infile);
+        Debug.printf("outdir: %s%n", outdir);
+        Debug.printf("kdatabases: %s%n", kdatabases);
+        Debug.printf("pids: %s%n", pids);
+        Debug.printf("serials: %s%n", serials);
 
         DeDRM.decryptBook(infile, outdir, kdatabases, serials, pids);
     }
