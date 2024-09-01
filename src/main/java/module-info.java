@@ -6,6 +6,6 @@ module dedrmtools {
     requires com.sun.jna.platform;
 
     opens cloud.tavitian.dedrmtools to com.google.gson;
-    opens cloud.tavitian.dedrmtools.kindlekeys to com.google.gson;
+    opens cloud.tavitian.dedrmtools.kindlekeys to com.google.gson, com.sun.jna;
     exports cloud.tavitian.dedrmtools;
 }

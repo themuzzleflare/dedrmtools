@@ -7,14 +7,10 @@ package cloud.tavitian.dedrmtools.kindlekeys;
 import cloud.tavitian.dedrmtools.Debug;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
-import com.sun.jna.win32.StdCallLibrary;
-import com.sun.jna.win32.W32APIOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -346,42 +342,5 @@ final class KindleKeyWindows extends KindleKey {
         }
 
         return db;
-    }
-
-    private interface Kernel32 extends StdCallLibrary {
-        Kernel32 INSTANCE = Native.load("kernel32", Kernel32.class, W32APIOptions.DEFAULT_OPTIONS);
-
-        int GetSystemDirectoryW(char[] lpBuffer, int uSize);
-
-        int GetVolumeInformationW(String lpRootPathName, char[] lpVolumeNameBuffer, int nVolumeNameSize,
-                                  IntByReference lpVolumeSerialNumber, IntByReference lpMaximumComponentLength,
-                                  IntByReference lpFileSystemFlags, char[] lpFileSystemNameBuffer, int nFileSystemNameSize);
-
-        int GetEnvironmentVariableW(String lpName, char[] lpBuffer, int nSize);
-
-        int GetLastError();
-    }
-
-    private interface Advapi32 extends StdCallLibrary {
-        Advapi32 INSTANCE = Native.load("advapi32", Advapi32.class, W32APIOptions.DEFAULT_OPTIONS);
-
-        boolean GetUserNameW(char[] buffer, IntByReference size);
-    }
-
-    private interface Crypt32 extends StdCallLibrary {
-        Crypt32 INSTANCE = Native.load("crypt32", Crypt32.class, W32APIOptions.DEFAULT_OPTIONS);
-
-        boolean CryptUnprotectData(DATA_BLOB pDataIn, PointerByReference ppszDataDescr, DATA_BLOB pOptionalEntropy,
-                                   Pointer pvReserved, Pointer pPromptStruct, int dwFlags, DATA_BLOB pDataOut);
-    }
-
-    private static class DATA_BLOB extends Structure {
-        public int cbData;
-        public Pointer pbData;
-
-        @Override
-        protected List<String> getFieldOrder() {
-            return Arrays.asList("cbData", "pbData");
-        }
     }
 }
