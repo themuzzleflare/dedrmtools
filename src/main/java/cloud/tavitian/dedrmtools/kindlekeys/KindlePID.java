@@ -175,16 +175,16 @@ public final class KindlePID {
     }
 
     // parse the Kindleinfo file to calculate the book pid.
-    private static Set<String> getK4Pids(byte[] rec209, byte[] token, KDatabase kindleDatabase) throws Exception {
+    private static Set<String> getK4Pids(byte[] rec209, byte[] token, KDatabaseRecord kDatabaseRecord) throws Exception {
         Set<String> pids = new LinkedHashSet<>();
 
-        byte[] kindleAccountToken = kindleDatabase.kindleDatabase().genKindleAccountToken();
+        byte[] kindleAccountToken = kDatabaseRecord.kindleDatabase().genKindleAccountToken();
         byte[] dsn;
 
         try {
-            dsn = kindleDatabase.kindleDatabase().genDSN();
+            dsn = kDatabaseRecord.kindleDatabase().genDSN();
         } catch (Exception _) {
-            System.out.printf("Keys not found in the database %s.%n", kindleDatabase.dbFile());
+            System.err.printf("Keys not found in the database %s.%n", kDatabaseRecord.dbFile());
             return pids;
         }
 
@@ -222,15 +222,15 @@ public final class KindlePID {
         return pids;
     }
 
-    public static Set<String> getPidSet(byte[] rec209, byte[] token, Set<String> serials, Set<KDatabase> kDatabases) {
+    public static Set<String> getPidSet(byte[] rec209, byte[] token, Set<String> serials, Set<KDatabaseRecord> kDatabaseRecords) {
         Set<String> pids = new LinkedHashSet<>();
 
-        for (KDatabase kDatabase : kDatabases) {
+        for (KDatabaseRecord kDatabaseRecord : kDatabaseRecords) {
             try {
-                Set<String> k4Pids = getK4Pids(rec209, token, kDatabase);
+                Set<String> k4Pids = getK4Pids(rec209, token, kDatabaseRecord);
                 pids.addAll(k4Pids);
             } catch (Exception e) {
-                System.err.printf("Error getting PIDs from database %s: %s%n", kDatabase.dbFile(), e.getMessage());
+                System.err.printf("Error getting PIDs from database %s: %s%n", kDatabaseRecord.dbFile(), e.getMessage());
                 e.printStackTrace();
             }
         }

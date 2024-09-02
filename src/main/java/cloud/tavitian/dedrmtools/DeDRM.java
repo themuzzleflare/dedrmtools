@@ -5,17 +5,14 @@
 package cloud.tavitian.dedrmtools;
 
 import cloud.tavitian.dedrmtools.kfxdedrm.KFXZipBook;
-import cloud.tavitian.dedrmtools.kindlekeys.KDatabase;
+import cloud.tavitian.dedrmtools.kindlekeys.KDatabaseRecord;
 import cloud.tavitian.dedrmtools.kindlekeys.KindleDatabase;
-import cloud.tavitian.dedrmtools.kindlekeys.KindleDatabaseStringValues;
 import cloud.tavitian.dedrmtools.kindlekeys.KindleKey;
 import cloud.tavitian.dedrmtools.mobidedrm.MobiBook;
 import cloud.tavitian.dedrmtools.topazextract.TopazBook;
-import com.google.gson.Gson;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -32,8 +29,6 @@ import static cloud.tavitian.dedrmtools.kindlekeys.KindlePID.getPidSet;
 
 public final class DeDRM {
     private static final String version = "2.0";
-
-    private static final Gson gson = new Gson();
 
     private DeDRM() {
     }
@@ -139,31 +134,31 @@ public final class DeDRM {
         return outfilename;
     }
 
-    private static Set<KDatabase> loadKDatabases(Set<String> kDatabaseFiles) {
-        Set<KDatabase> kDatabases = new LinkedHashSet<>();
+    private static Set<KDatabaseRecord> loadKDatabaseRecords(Set<String> kDatabaseFiles) {
+        Set<KDatabaseRecord> kDatabaseRecords = new LinkedHashSet<>();
 
-        if (sanitiseStringSet(kDatabaseFiles).isEmpty()) return kDatabases;
+        if (sanitiseStringSet(kDatabaseFiles).isEmpty()) return kDatabaseRecords;
 
         for (String kDatabaseFile : kDatabaseFiles) {
-            try (FileReader reader = new FileReader(kDatabaseFile)) {
-                KindleDatabase<String> kindleDatabase = gson.fromJson(reader, KindleDatabaseStringValues.class);
-                KDatabase kDatabase = new KDatabase(kDatabaseFile, kindleDatabase);
-                kDatabases.add(kDatabase);
+            try {
+                KindleDatabase<String> kindleDatabase = new KindleDatabase<>(kDatabaseFile);
+                KDatabaseRecord kDatabaseRecord = new KDatabaseRecord(kDatabaseFile, kindleDatabase);
+                kDatabaseRecords.add(kDatabaseRecord);
             } catch (IOException e) {
                 System.err.printf("Error getting database from file %s: %s%n", kDatabaseFile, e.getMessage());
             }
         }
 
-        return kDatabases;
+        return kDatabaseRecords;
     }
 
-    private static void decryptionRoutine(String infile, String outdir, Set<KDatabase> kDatabases, Set<String> serials, Set<String> pids) throws Exception {
-        decryptionRoutine(infile, outdir, kDatabases, serials, pids, System.currentTimeMillis());
+    private static void decryptionRoutine(String infile, String outdir, Set<KDatabaseRecord> kDatabaseRecords, Set<String> serials, Set<String> pids) throws Exception {
+        decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, System.currentTimeMillis());
     }
 
-    private static void decryptionRoutine(String infile, String outdir, Set<KDatabase> kDatabases, Set<String> serials, Set<String> pids, long startTime) throws Exception {
+    private static void decryptionRoutine(String infile, String outdir, Set<KDatabaseRecord> kDatabaseRecords, Set<String> serials, Set<String> pids, long startTime) throws Exception {
         try {
-            Book mb = getDecryptedBook(infile, kDatabases, serials, pids);
+            Book mb = getDecryptedBook(infile, kDatabaseRecords, serials, pids);
 
             String outfilename = calculateOutfileName(infile, mb.getBookTitle());
             String outpath = Path.of(outdir, outfilename + mb.getBookExtension()).toString();
@@ -179,11 +174,11 @@ public final class DeDRM {
         }
     }
 
-    private static Book getDecryptedBook(String infile, Set<KDatabase> kDatabases, Set<String> serials, Set<String> pids) throws Exception {
-        return getDecryptedBook(infile, kDatabases, serials, pids, System.currentTimeMillis());
+    private static Book getDecryptedBook(String infile, Set<KDatabaseRecord> kDatabaseRecords, Set<String> serials, Set<String> pids) throws Exception {
+        return getDecryptedBook(infile, kDatabaseRecords, serials, pids, System.currentTimeMillis());
     }
 
-    private static Book getDecryptedBook(String infile, Set<KDatabase> kDatabases, Set<String> serials, Set<String> pids, long startTime) throws Exception {
+    private static Book getDecryptedBook(String infile, Set<KDatabaseRecord> kDatabaseRecords, Set<String> serials, Set<String> pids, long startTime) throws Exception {
         Book book;
 
         boolean mobi = true;
@@ -218,7 +213,7 @@ public final class DeDRM {
         byte[] rec209 = pidMetaInfo.rec209();
         byte[] token = pidMetaInfo.token();
 
-        totalPids.addAll(getPidSet(rec209, token, serials, kDatabases));
+        totalPids.addAll(getPidSet(rec209, token, serials, kDatabaseRecords));
 
         System.out.printf("Found %d keys to try after %.1f seconds%n", totalPids.size(), (System.currentTimeMillis() - startTime) / 1000.0);
 
@@ -235,8 +230,13 @@ public final class DeDRM {
     }
 
     public static boolean generateKeyfile(String outpath) {
-        KindleKey instance = KindleKey.getInstance();
-        return instance.getKey(outpath);
+        try {
+            KindleKey instance = KindleKey.getInstance();
+            return instance.getKey(outpath);
+        } catch (Exception e) {
+            System.err.printf("Error generating keyfile: %s%n", e.getMessage());
+            return false;
+        }
     }
 
     public static void decryptBook(String infile, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {
@@ -249,10 +249,10 @@ public final class DeDRM {
         System.out.printf("K4MobiDeDrm v%s.%n%s.%n", version, copyright);
         System.out.println("Removes DRM protection from Mobipocket, Amazon KF8, Amazon Print Replica, and Amazon Topaz eBooks.");
 
-        Set<KDatabase> kDatabases = loadKDatabases(kDatabaseFiles);
+        Set<KDatabaseRecord> kDatabaseRecords = loadKDatabaseRecords(kDatabaseFiles);
 
         try {
-            decryptionRoutine(infile, outdir, kDatabases, serials, pids, startTime);
+            decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, startTime);
         } catch (Exception _) {
         }
     }
@@ -267,13 +267,13 @@ public final class DeDRM {
         System.out.printf("K4MobiDeDrm v%s.%n%s.%n", version, copyright);
         System.out.println("Removes DRM protection from Mobipocket, Amazon KF8, Amazon Print Replica, and Amazon Topaz eBooks.");
 
-        Set<KDatabase> kDatabases = loadKDatabases(kDatabaseFiles);
+        Set<KDatabaseRecord> kDatabaseRecords = loadKDatabaseRecords(kDatabaseFiles);
 
         int decryptionCounter = 0;
 
         for (String infile : infiles) {
             try {
-                decryptionRoutine(infile, outdir, kDatabases, serials, pids, startTime);
+                decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, startTime);
                 decryptionCounter++;
             } catch (Exception _) {
             } finally {

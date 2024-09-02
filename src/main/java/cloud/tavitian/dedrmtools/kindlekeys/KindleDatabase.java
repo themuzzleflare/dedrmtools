@@ -5,7 +5,9 @@
 package cloud.tavitian.dedrmtools.kindlekeys;
 
 import cloud.tavitian.dedrmtools.Debug;
+import com.google.gson.Gson;
 
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
@@ -18,6 +20,8 @@ import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.encode;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.encodeHash;
 
 public class KindleDatabase<V> extends LinkedHashMap<String, V> {
+    private static final Gson gson = new Gson();
+
     private static final String kindleAccountTokensKey = "kindle.account.tokens";
     private static final String dsnKey = "DSN";
     private static final String mazamaRandomNumberKey = "MazamaRandomNumber";
@@ -68,6 +72,38 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
             proxyHttpPasswordKey.getBytes(StandardCharsets.US_ASCII),
             proxyHttpUsernameKey.getBytes(StandardCharsets.US_ASCII)
     };
+
+    public KindleDatabase() {
+        super();
+    }
+
+    public KindleDatabase(File file) throws FileNotFoundException {
+        this(file.getAbsolutePath());
+    }
+
+    public KindleDatabase(String filename) throws FileNotFoundException {
+        super();
+        putAll(loadFromFile(filename));
+    }
+
+    public static <V> KindleDatabase<V> loadFromFile(File file) throws FileNotFoundException {
+        return loadFromFile(file.getAbsolutePath());
+    }
+
+    public static <V> KindleDatabase<V> loadFromFile(String filename) throws FileNotFoundException {
+        FileReader fileReader = new FileReader(filename);
+        return gson.fromJson(fileReader, KindleDatabase.class);
+    }
+
+    public void writeToFile(File file) throws IOException {
+        writeToFile(file.getAbsolutePath());
+    }
+
+    public void writeToFile(String filename) throws IOException {
+        FileWriter fileWriter = new FileWriter(filename);
+        gson.toJson(this, fileWriter);
+        fileWriter.close();
+    }
 
     public V getKindleAccountToken() {
         return get(kindleAccountTokensKey);

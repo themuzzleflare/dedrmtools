@@ -15,15 +15,13 @@ final class MetaDictionary extends LinkedHashMap<Integer, byte[]> {
     public String toString() {
         Iterator<Map.Entry<Integer, byte[]>> i = entrySet().iterator();
 
-        if (!i.hasNext())
-            return "{}";
+        if (!i.hasNext()) return "{}";
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append('{');
+        StringBuilder sb = new StringBuilder("{");
 
         for (; ; ) {
             Map.Entry<Integer, byte[]> e = i.next();
+
             Integer key = e.getKey();
             byte[] value = e.getValue();
 
@@ -31,8 +29,7 @@ final class MetaDictionary extends LinkedHashMap<Integer, byte[]> {
             sb.append('=');
             sb.append(formatByteArray(value));
 
-            if (!i.hasNext())
-                return sb.append('}').toString();
+            if (!i.hasNext()) return sb.append('}').toString();
 
             sb.append(',').append(' ');
         }

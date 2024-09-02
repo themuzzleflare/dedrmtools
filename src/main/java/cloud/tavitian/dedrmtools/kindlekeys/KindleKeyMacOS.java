@@ -4,6 +4,7 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
+import cloud.tavitian.dedrmtools.BytesList;
 import cloud.tavitian.dedrmtools.Debug;
 
 import javax.crypto.Cipher;
@@ -31,7 +32,7 @@ final class KindleKeyMacOS extends KindleKey {
     private static final byte[] charMap5 = charMap2;
 
     private static List<byte[]> getMacAddressesMunged() {
-        List<byte[]> macNums = new ArrayList<>();
+        List<byte[]> macNums = new BytesList();
 
         String macNum = System.getenv("MYMACNUM");
 
@@ -84,11 +85,14 @@ final class KindleKeyMacOS extends KindleKey {
             e.printStackTrace();
         }
 
+        Debug.printf("MAC addresses munged: %s%n", macNums);
+
         return macNums;
     }
 
     private static List<byte[]> getVolumesSerialNumbers() {
-        List<byte[]> serNums = new ArrayList<>();
+        List<byte[]> serNums = new BytesList();
+
         String serNum = System.getenv("MYSERIALNUMBER");
 
         // Add MYSERIALNUMBER environment variable if it's set
@@ -121,11 +125,13 @@ final class KindleKeyMacOS extends KindleKey {
             e.printStackTrace();
         }
 
+        Debug.printf("Volume serial numbers: %s%n", serNums);
+
         return serNums;
     }
 
     private static List<byte[]> getDiskPartitionNames() {
-        List<byte[]> names = new ArrayList<>();
+        List<byte[]> names = new BytesList();
 
         // Command to list mounted partitions
         String command = "/sbin/mount";
@@ -155,11 +161,14 @@ final class KindleKeyMacOS extends KindleKey {
             e.printStackTrace();
         }
 
+        Debug.printf("Disk partition names: %s%n", names);
+
         return names;
     }
 
     private static List<byte[]> getDiskPartitionUUIDs() {
-        List<byte[]> uuids = new ArrayList<>();
+        List<byte[]> uuids = new BytesList();
+
         String uuidNum = System.getenv("MYUUIDNUMBER");
 
         // Add MYUUIDNUMBER environment variable if it's set
@@ -192,12 +201,14 @@ final class KindleKeyMacOS extends KindleKey {
             e.printStackTrace();
         }
 
+        Debug.printf("Disk partition UUIDs: %s%n", uuids);
+
         return uuids;
     }
 
     private static List<byte[]> getIdStrings() {
         // Return all possible ID Strings
-        List<byte[]> strings = new ArrayList<>();
+        List<byte[]> strings = new BytesList();
 
         // Extend the list with results from various methods
         strings.addAll(getMacAddressesMunged());
@@ -208,13 +219,27 @@ final class KindleKeyMacOS extends KindleKey {
         // Add a fixed byte array as per the original code
         strings.add("9999999999".getBytes());
 
+        Debug.printf("ID strings: %s%n", strings);
+
         return strings;
+    }
+
+    private static void checkAndAddFile(KindlePath testPath, List<String> kInfoFiles) {
+        File file = new File(testPath.path());
+
+        if (file.exists()) {
+            System.out.printf("Found %s%n", testPath);
+            kInfoFiles.add(testPath.path());
+        }
     }
 
     @Override
     public byte[] getUsername() {
         // Get the username from the environment variables
         String username = System.getenv("USER");
+
+        Debug.printf("Username: %s%n", username);
+
         return username.getBytes(StandardCharsets.UTF_8);
     }
 
@@ -222,43 +247,26 @@ final class KindleKeyMacOS extends KindleKey {
     public List<String> getKindleInfoFiles() {
         // List to store found paths
         List<String> kInfoFiles = new ArrayList<>();
-        boolean found = false;
 
         // Get the HOME environment variable
         String home = System.getenv("HOME");
 
         // List of known paths to check for the Kindle info files
-        String[] pathsToCheck = {
-                home + "/Library/Containers/com.amazon.Kindle/Data/Library/Application Support/Kindle/storage/.kinf2018",
-                home + "/Library/Application Support/Kindle/storage/.kinf2018",
-                home + "/Library/Containers/com.amazon.Kindle/Data/Library/Application Support/Kindle/storage/.kinf2011",
-                home + "/Library/Application Support/Kindle/storage/.kinf2011",
-                home + "/Library/Application Support/Kindle/storage/.rainier-2.1.1-kinf",
-                home + "/Library/Application Support/Kindle/storage/.kindle-info",
-                home + "/Library/Application Support/Amazon/Kindle/storage/.kindle-info",
-                home + "/Library/Application Support/Amazon/Kindle for Mac/storage/.kindle-info"
-        };
+        List<KindlePath> pathsToCheck = KindlePath.getKindlePathsMac(home);
 
         // Check each path to see if the file exists
-        for (String testPath : pathsToCheck) {
-            File file = new File(testPath);
-
-            if (file.exists()) {
-                kInfoFiles.add(testPath);
-                System.out.printf("Found Kindle info file: %s%n", testPath);
-                found = true;
-            }
-        }
+        for (KindlePath testPath : pathsToCheck) checkAndAddFile(testPath, kInfoFiles);
 
         // Print message if no files were found
-        if (!found) System.out.println("No k4Mac kindle-info/rainier/kinf2011 files have been found.");
+        if (kInfoFiles.isEmpty())
+            System.err.println("No k4Mac kindle-info/rainier/kinf2011/kinf2018 files have been found.");
 
         return kInfoFiles;
     }
 
     @Override
     public KindleDatabase<byte[]> getDbFromFile(String kInfoFile) {
-        KindleDatabaseByteValues db = new KindleDatabaseByteValues();
+        KindleDatabase<byte[]> db = new KindleDatabase<>();
 
         // Read file content
         byte[] fileData;
@@ -360,6 +368,8 @@ final class KindleKeyMacOS extends KindleKey {
 
                     if (keyName.equals("unknown")) keyName = new String(keyHash);
 
+                    Debug.printf("keyName: %s%n", keyName);
+
                     byte[] encdata = edlst.toByteArray();
 
                     Debug.printf("encdata: %s%n", formatByteArray(encdata));
@@ -420,7 +430,7 @@ final class KindleKeyMacOS extends KindleKey {
         } else {
             db.clear();
 
-            System.out.println("Couldn't decrypt file.");
+            System.err.println("Couldn't decrypt file.");
         }
 
         return db;

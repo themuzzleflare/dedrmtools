@@ -33,8 +33,10 @@ final class PukallCipher {
 
     private static int[] initializeWKey(byte[] key) {
         int[] wkey = new int[KEY_COMPONENTS];
+
         for (int i = 0; i < KEY_COMPONENTS; i++)
             wkey[i] = ((key[i * 2] & BYTE_MASK) << 8) | (key[i * 2 + 1] & BYTE_MASK);
+
         return wkey;
     }
 

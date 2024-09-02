@@ -188,21 +188,9 @@ public final class Util {
     // Helper method to find the index of a byte in a byte array, similar to Python's find() method.
     public static int indexOf(byte[] array, byte value) {
         for (int i = 0; i < array.length; i++) {
-            if (array[i] == value) {
-                return i;
-            }
+            if (array[i] == value) return i;
         }
+
         return -1; // Returns -1 if the byte is not found in the array
-    }
-
-    /**
-     * @param s string to print to the console. This is a helper function to avoid having to type System.out.println() every time.
-     */
-    public static void print(String s) {
-        System.out.println(s);
-    }
-
-    public static void printKeyVal(String key, String val) {
-        System.out.printf("%s: %s%n", key, val);
     }
 }

@@ -98,11 +98,12 @@ final class KindleKeyWindows extends KindleKey {
         return Native.toString(buffer);
     }
 
-    private static void checkAndAddFile(String filePath, String successMessage, List<String> kInfoFiles) {
-        File file = new File(filePath);
+    private static void checkAndAddFile(KindlePath testPath, List<String> kInfoFiles) {
+        File file = new File(testPath.path());
+
         if (file.isFile()) {
-            System.out.println(successMessage + filePath);
-            kInfoFiles.add(filePath);
+            System.out.printf("Found %s%n", testPath);
+            kInfoFiles.add(testPath.path());
         }
     }
 
@@ -159,36 +160,31 @@ final class KindleKeyWindows extends KindleKey {
 
                         if (!new File(path).isDirectory()) path = "";
                     } catch (Exception _) {
-                        // Ignore exception, just try the next approach
                     }
                 }
             } catch (Exception _) {
-                // Ignore exception, just proceed
             }
         }
 
-        boolean found = false;
-
-        if (path.isEmpty()) System.out.println("Could not find the folder in which to look for Kindle info files.");
+        if (path.isEmpty()) System.err.println("Could not find the folder in which to look for kinfoFiles.");
         else {
-            System.out.printf("Searching for Kindle info files in %s%n", path);
+            System.out.printf("searching for kinfoFiles files in %s%n", path);
 
             // Check for various Kindle info files based on the version
-            checkAndAddFile(path + "\\Amazon\\Kindle\\storage\\.kinf2018", "Found K4PC 1.25+ kinf2018 file: ", kInfoFiles);
-            checkAndAddFile(path + "\\Amazon\\Kindle\\storage\\.kinf2011", "Found K4PC 1.9+ kinf2011 file: ", kInfoFiles);
-            checkAndAddFile(path + "\\Amazon\\Kindle\\storage\\rainier.2.1.1.kinf", "Found K4PC 1.6-1.8 kinf file: ", kInfoFiles);
-            checkAndAddFile(path + "\\Amazon\\Kindle For PC\\storage\\rainier.2.1.1.kinf", "Found K4PC 1.5 kinf file: ", kInfoFiles);
-            checkAndAddFile(path + "\\Amazon\\Kindle For PC\\{AMAwzsaPaaZAzmZzZQzgZCAkZ3AjA_AY}\\kindle.info", "Found K4PC kindle.info file: ", kInfoFiles);
+            List<KindlePath> kindlePaths = KindlePath.getKindlePathsWindows(path);
+
+            for (KindlePath testPath : kindlePaths) checkAndAddFile(testPath, kInfoFiles);
         }
 
-        if (kInfoFiles.isEmpty()) System.out.println("No K4PC kindle.info/kinf/kinf2011 files have been found.");
+        if (kInfoFiles.isEmpty())
+            System.err.println("No K4PC kindle.info/kinf/kinf2011/kinf2018 files have been found.");
 
         return kInfoFiles;
     }
 
     @Override
     public KindleDatabase<byte[]> getDbFromFile(String kInfoFile) {
-        KindleDatabaseByteValues db = new KindleDatabaseByteValues();
+        KindleDatabase<byte[]> db = new KindleDatabase<>();
 
         // Read file content
         byte[] fileData;
@@ -338,7 +334,7 @@ final class KindleKeyWindows extends KindleKey {
         } else {
             db.clear();
 
-            System.out.println("Couldn't decrypt file.");
+            System.err.println("Couldn't decrypt file.");
         }
 
         return db;

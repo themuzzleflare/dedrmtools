@@ -93,7 +93,7 @@ final class IonUtils {
         ion.addToCatalog("ProtectedData", 1, SYM_NAMES);
     }
 
-    public static byte[] pkcs7Pad(byte[] msg, int blockLen) {
+    private static byte[] pkcs7Pad(byte[] msg, int blockLen) {
         int paddingLen = blockLen - (msg.length % blockLen);
         byte padding = (byte) paddingLen;
         byte[] paddingBytes = new byte[paddingLen];
@@ -106,7 +106,7 @@ final class IonUtils {
         return paddedMsg;
     }
 
-    public static byte[] pkcs7Unpad(byte[] msg, int blocklen) throws Exception {
+    private static byte[] pkcs7Unpad(byte[] msg, int blocklen) throws Exception {
         if (msg.length % blocklen != 0)
             throw new IllegalArgumentException("Message length is not a multiple of block size");
 

@@ -5,11 +5,8 @@
 package cloud.tavitian.dedrmtools.kindlekeys;
 
 import cloud.tavitian.dedrmtools.Debug;
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonWriter;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -21,26 +18,22 @@ import static cloud.tavitian.dedrmtools.Util.byteArrayToHexString;
 import static cloud.tavitian.dedrmtools.Util.formatByteArray;
 
 public abstract class KindleKey implements KindleKeyManager {
-    private static final Gson gson = new Gson();
     private static final String osName = System.getProperty("os.name").toLowerCase();
 
-    public static KindleKey getInstance() {
+    public static KindleKey getInstance() throws Exception {
         if (osName.startsWith("win")) return new KindleKeyWindows();
         else if (osName.startsWith("mac") || osName.startsWith("darwin")) return new KindleKeyMacOS();
-        else throw new UnsupportedOperationException("Unsupported operating system: " + osName);
+        else throw new Exception(String.format("Unsupported OS: %s", osName));
     }
 
     // Method to decrypt the encrypted data using a derived key and IV
     static byte[] unprotectHeaderData(byte[] encryptedData) throws Exception {
-        Debug.println("Encrypted data: " + formatByteArray(encryptedData));
+        Debug.printf("Encrypted data: %s%n", formatByteArray(encryptedData));
 
-        char[] passwdData = "header_key_data".toCharArray(); // Password equivalent
-        byte[] salt = "HEADER.2011".getBytes(StandardCharsets.US_ASCII); // Salt equivalent
+        byte[] passwdData = "header_key_data".getBytes(StandardCharsets.US_ASCII);
+        byte[] salt = "HEADER.2011".getBytes(StandardCharsets.US_ASCII);
 
-        int iterationCount = 128; // PBKDF2 iteration count
-        int keyLength = 256; // Desired key length in bits
-
-        byte[] keyIv = pbkdf2hmacsha1(passwdData, salt, iterationCount, keyLength);
+        byte[] keyIv = pbkdf2hmacsha1(passwdData, salt, 128, 256);
 
         Debug.printf("Derived key: %s%n", formatByteArray(keyIv));
 
@@ -57,10 +50,6 @@ public abstract class KindleKey implements KindleKeyManager {
     }
 
     static List<Integer> primes(int n) {
-        // Return a list of prime integers smaller than or equal to n
-        // :param n: int
-        // :return: List<Integer>
-
         if (n == 2) return List.of(2);
         else if (n < 2) return Collections.emptyList();
 
@@ -84,11 +73,11 @@ public abstract class KindleKey implements KindleKeyManager {
         return primeList;
     }
 
-    KindleKeys kindleKeys(List<String> files) {
+    List<KindleDatabase<String>> kindleKeys(List<String> files) {
         // If files is null, retrieve the Kindle info files
         if (files == null || files.isEmpty()) files = getKindleInfoFiles();
 
-        KindleKeys keys = new KindleKeys();
+        List<KindleDatabase<String>> keys = new ArrayList<>();
 
         // Process each file
         for (String file : files) {
@@ -96,7 +85,7 @@ public abstract class KindleKey implements KindleKeyManager {
 
             if (key != null && !key.isEmpty()) {
                 // Convert all values to hex strings
-                KindleDatabaseStringValues nKey = new KindleDatabaseStringValues();
+                KindleDatabase<String> nKey = new KindleDatabase<>();
 
                 for (Map.Entry<String, byte[]> entry : key.entrySet()) {
                     // Convert the value to a hexadecimal string
@@ -121,7 +110,7 @@ public abstract class KindleKey implements KindleKeyManager {
         if (files == null) files = List.of();  // Creates an empty list
 
         // Retrieve Kindle keys using the kindleKeys method
-        KindleKeys keys = kindleKeys(files);
+        List<KindleDatabase<String>> keys = kindleKeys(files);
 
         if (!keys.isEmpty()) {
             File outFile = new File(outpath);
@@ -129,10 +118,9 @@ public abstract class KindleKey implements KindleKeyManager {
             // Check if the output path is a directory or a file
             if (!outFile.isDirectory()) {
                 // If it's not a directory, assume it's a file path
-                try (FileWriter keyfileOut = new FileWriter(outFile);
-                     JsonWriter jsonWriter = new JsonWriter(keyfileOut)) {
+                try {
                     // Write the first key to the specified file
-                    gson.toJson(keys.getFirst(), KindleDatabase.class, jsonWriter);
+                    keys.getFirst().writeToFile(outFile);
                     System.out.printf("Saved a key to %s%n", outFile.getAbsolutePath());
                 } catch (IOException e) {
                     System.err.printf("Error saving key to file: %s%n", e.getMessage());
@@ -149,12 +137,11 @@ public abstract class KindleKey implements KindleKeyManager {
 
                         // Check if the file already exists
                         if (!new File(outfile).exists()) {
-                            try (FileWriter keyfileOut = new FileWriter(outfile);
-                                 JsonWriter jsonWriter = new JsonWriter(keyfileOut)) {
-                                gson.toJson(key, KindleDatabase.class, jsonWriter);
+                            try {
+                                key.writeToFile(outfile);
                                 System.out.printf("Saved a key to %s%n", outfile);
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                System.err.printf("Error saving key to file: %s%n", e.getMessage());
                                 return false;
                             }
 

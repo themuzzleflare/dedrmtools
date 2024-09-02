@@ -26,7 +26,7 @@ public final class KFXZipBook extends Book {
     private static final String version = "2.0";
 
     private final String infile;
-    private final KFXDecryptedDict decrypted = new KFXDecryptedDict();
+    private final KFXDecryptedDictionary decrypted = new KFXDecryptedDictionary();
     private DRMIonVoucher voucher;
 
     public KFXZipBook(String infile) {
