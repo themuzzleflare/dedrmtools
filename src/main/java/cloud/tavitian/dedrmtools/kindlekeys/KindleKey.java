@@ -120,7 +120,7 @@ public abstract class KindleKey implements KindleKeyManager {
                 // If it's not a directory, assume it's a file path
                 try {
                     // Write the first key to the specified file
-                    keys.getFirst().writeToFile(outFile);
+                    keys.get(0).writeToFile(outFile);
                     System.out.printf("Saved a key to %s%n", outFile.getAbsolutePath());
                 } catch (IOException e) {
                     System.err.printf("Error saving key to file: %s%n", e.getMessage());

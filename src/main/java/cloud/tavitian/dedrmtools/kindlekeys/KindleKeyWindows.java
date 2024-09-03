@@ -159,10 +159,10 @@ final class KindleKeyWindows extends KindleKey {
                                 "Local AppData");
 
                         if (!new File(path).isDirectory()) path = "";
-                    } catch (Exception _) {
+                    } catch (Exception ignored) {
                     }
                 }
-            } catch (Exception _) {
+            } catch (Exception ignored) {
             }
         }
 
@@ -204,7 +204,7 @@ final class KindleKeyWindows extends KindleKey {
         List<String> items = new ArrayList<>(Arrays.asList(new String(data).split("/")));
 
         // starts with an encoded and encrypted header blob
-        String headerblob = items.removeFirst();
+        String headerblob = items.remove(0);
         byte[] encryptedValue = decode(headerblob.getBytes(), testMap1);
 
         try {
@@ -250,7 +250,7 @@ final class KindleKeyWindows extends KindleKey {
 
             // Process each item
             while (!items.isEmpty()) {
-                String item = items.removeFirst();
+                String item = items.remove(0);
                 byte[] keyHash = item.substring(0, 32).getBytes(StandardCharsets.UTF_8);
                 byte[] srcnt = decode(item.substring(34).getBytes(), charMap5);
 
@@ -263,7 +263,7 @@ final class KindleKeyWindows extends KindleKey {
                 ByteArrayOutputStream edlst = new ByteArrayOutputStream();
 
                 for (int i = 0; i < rcnt; i++) {
-                    String record = items.removeFirst();
+                    String record = items.remove(0);
                     edlst.write(record.getBytes(StandardCharsets.UTF_8));
                 }
 
@@ -284,7 +284,8 @@ final class KindleKeyWindows extends KindleKey {
 
                 Debug.printf("encdata: %s%n", formatByteArray(encdata));
 
-                int noffset = encdata.length - primes(encdata.length / 3).getLast();
+                List<Integer> primesList = primes(encdata.length / 3);
+                int noffset = encdata.length - primesList.get(primesList.size() - 1);
                 byte[] pfx = Arrays.copyOfRange(encdata, 0, noffset);
                 byte[] suffix = Arrays.copyOfRange(encdata, noffset, encdata.length);
 

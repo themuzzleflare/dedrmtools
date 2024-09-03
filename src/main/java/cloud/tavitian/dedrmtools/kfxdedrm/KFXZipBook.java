@@ -160,7 +160,7 @@ public final class KFXZipBook extends Book {
                         decrypted = true;
                         decryptedVoucher = voucher;
                         break outerLoop; // Break out of both loops if successful
-                    } catch (Exception _) {
+                    } catch (Exception ignored) {
                     }
                 }
             }

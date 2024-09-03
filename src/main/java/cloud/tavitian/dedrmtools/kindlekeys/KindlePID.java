@@ -183,7 +183,7 @@ public final class KindlePID {
 
         try {
             dsn = kDatabaseRecord.kindleDatabase().genDSN();
-        } catch (Exception _) {
+        } catch (Exception ignored) {
             System.err.printf("Keys not found in the database %s.%n", kDatabaseRecord.dbFile());
             return pids;
         }

@@ -91,13 +91,13 @@ public final class DeDRM {
                     if (match.startsWith("&#x"))
                         replacement = String.valueOf((char) Integer.parseInt(match.substring(3, match.length() - 1), 16));
                     else replacement = String.valueOf((char) Integer.parseInt(match.substring(2, match.length() - 1)));
-                } catch (NumberFormatException _) {
+                } catch (NumberFormatException ignored) {
                 }
             } else {
                 // Named entity
                 try {
                     replacement = StringEscapeUtils.unescapeHtml4(match);
-                } catch (Exception _) {
+                } catch (Exception ignored) {
                 }
             }
 
@@ -253,7 +253,7 @@ public final class DeDRM {
 
         try {
             decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, startTime);
-        } catch (Exception _) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -275,7 +275,7 @@ public final class DeDRM {
             try {
                 decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, startTime);
                 decryptionCounter++;
-            } catch (Exception _) {
+            } catch (Exception ignored) {
             } finally {
                 System.out.println();
             }

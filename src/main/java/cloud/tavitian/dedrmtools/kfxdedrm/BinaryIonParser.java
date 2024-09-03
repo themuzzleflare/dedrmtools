@@ -151,7 +151,7 @@ final class BinaryIonParser {
     }
 
     public void stepOut() throws IOException {
-        ContainerRec rec = containerStack.removeLast();
+        ContainerRec rec = containerStack.remove(containerStack.size() - 1);
 
         eof = false;
         parentTid = rec.tid();
@@ -265,8 +265,8 @@ final class BinaryIonParser {
 
         List<Integer> b = ordList(read(localRemaining));
 
-        if ((b.getFirst() & 0x80) != 0) {
-            b.set(0, (b.getFirst() & 0x7F));
+        if ((b.get(0) & 0x80) != 0) {
+            b.set(0, (b.get(0) & 0x7F));
             signed = true;
         }
 
@@ -294,7 +294,7 @@ final class BinaryIonParser {
 
         try {
             return readVarUInt();
-        } catch (Exception _) {
+        } catch (Exception ignored) {
             return -1;
         }
     }
@@ -536,7 +536,7 @@ final class BinaryIonParser {
 
     public String getTypeName() {
         if (annotations.isEmpty()) return "";
-        return symbols.findById(annotations.getFirst());
+        return symbols.findById(annotations.get(0));
     }
 
     private void forceImport(List<String> symbols) {
