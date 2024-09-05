@@ -4,11 +4,11 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
-import java.util.List;
+import java.util.Set;
 
 record KindlePath(KindleDatabaseType type, String path) {
-    public static List<KindlePath> getKindlePathsMac(String homeDir) {
-        return List.of(
+    public static Set<KindlePath> getKindlePathsMac(String homeDir) {
+        return Set.of(
                 // .kinf2018 file in new location (App Store Kindle for Mac)
                 new KindlePath(KindleDatabaseType.K4MACKINF2018, homeDir + "/Library/Containers/com.amazon.Kindle/Data/Library/Application Support/Kindle/storage/.kinf2018"),
                 // .kinf2018 files
@@ -28,8 +28,8 @@ record KindlePath(KindleDatabaseType type, String path) {
         );
     }
 
-    public static List<KindlePath> getKindlePathsWindows(String homeDir) {
-        return List.of(
+    public static Set<KindlePath> getKindlePathsWindows(String homeDir) {
+        return Set.of(
                 // (K4PC 1.25.1 and later) .kinf2018 file
                 new KindlePath(KindleDatabaseType.K4PC125KINF2018, homeDir + "\\Amazon\\Kindle\\storage\\.kinf2018"),
                 // (K4PC 1.9.0 and later) .kinf2011 file

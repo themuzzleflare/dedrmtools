@@ -73,19 +73,19 @@ public abstract class KindleKey implements KindleKeyManager {
         return primeList;
     }
 
-    List<KindleDatabase<String>> kindleKeys(List<String> files) {
+    Set<KindleDatabase> kindleKeys(Set<String> files) {
         // If files is null, retrieve the Kindle info files
         if (files == null || files.isEmpty()) files = getKindleInfoFiles();
 
-        List<KindleDatabase<String>> keys = new ArrayList<>();
+        Set<KindleDatabase> keys = new LinkedHashSet<>();
 
         // Process each file
         for (String file : files) {
-            KindleDatabase<byte[]> key = getDbFromFile(file);
+            Map<String, byte[]> key = getDbFromFile(file);
 
             if (key != null && !key.isEmpty()) {
                 // Convert all values to hex strings
-                KindleDatabase<String> nKey = new KindleDatabase<>();
+                KindleDatabase nKey = new KindleDatabase();
 
                 for (Map.Entry<String, byte[]> entry : key.entrySet()) {
                     // Convert the value to a hexadecimal string
@@ -105,12 +105,12 @@ public abstract class KindleKey implements KindleKeyManager {
         return getKey(outpath, null);
     }
 
-    public boolean getKey(String outpath, List<String> files) {
+    public boolean getKey(String outpath, Set<String> files) {
         // Check if files list is null, and initialize it if necessary
-        if (files == null) files = List.of();  // Creates an empty list
+        if (files == null) files = Set.of();  // Creates an empty list
 
         // Retrieve Kindle keys using the kindleKeys method
-        List<KindleDatabase<String>> keys = kindleKeys(files);
+        Set<KindleDatabase> keys = kindleKeys(files);
 
         if (!keys.isEmpty()) {
             File outFile = new File(outpath);
@@ -120,7 +120,7 @@ public abstract class KindleKey implements KindleKeyManager {
                 // If it's not a directory, assume it's a file path
                 try {
                     // Write the first key to the specified file
-                    keys.get(0).writeToFile(outFile);
+                    keys.iterator().next().writeToFile(outFile);
                     System.out.printf("Saved a key to %s%n", outFile.getAbsolutePath());
                 } catch (IOException e) {
                     System.err.printf("Error saving key to file: %s%n", e.getMessage());
@@ -130,7 +130,7 @@ public abstract class KindleKey implements KindleKeyManager {
                 // If it's a directory, save each key to a separate file with a unique name
                 int keyCount = 0;
 
-                for (KindleDatabase<String> key : keys) {
+                for (KindleDatabase key : keys) {
                     while (true) {
                         keyCount++;
                         String outfile = Paths.get(outpath, String.format("kindlekey%d.k4i", keyCount)).toString();

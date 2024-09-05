@@ -4,12 +4,13 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 interface KindleKeyManager {
     byte[] getUsername();
 
-    List<String> getKindleInfoFiles();
+    Set<String> getKindleInfoFiles();
 
-    KindleDatabase<byte[]> getDbFromFile(String kInfoFile);
+    Map<String, byte[]> getDbFromFile(String kInfoFile);
 }

@@ -17,9 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,7 +96,7 @@ final class KindleKeyWindows extends KindleKey {
         return Native.toString(buffer);
     }
 
-    private static void checkAndAddFile(KindlePath testPath, List<String> kInfoFiles) {
+    private static void checkAndAddFile(KindlePath testPath, Set<String> kInfoFiles) {
         File file = new File(testPath.path());
 
         if (file.isFile()) {
@@ -132,8 +130,9 @@ final class KindleKeyWindows extends KindleKey {
     }
 
     @Override
-    public List<String> getKindleInfoFiles() {
-        List<String> kInfoFiles = new ArrayList<>();
+    public Set<String> getKindleInfoFiles() {
+        Set<String> kInfoFiles = new LinkedHashSet<>();
+
         String path = "";
 
         // Retrieve the LOCALAPPDATA environment variable
@@ -171,7 +170,7 @@ final class KindleKeyWindows extends KindleKey {
             System.out.printf("searching for kinfoFiles files in %s%n", path);
 
             // Check for various Kindle info files based on the version
-            List<KindlePath> kindlePaths = KindlePath.getKindlePathsWindows(path);
+            Set<KindlePath> kindlePaths = KindlePath.getKindlePathsWindows(path);
 
             for (KindlePath testPath : kindlePaths) checkAndAddFile(testPath, kInfoFiles);
         }
@@ -183,15 +182,15 @@ final class KindleKeyWindows extends KindleKey {
     }
 
     @Override
-    public KindleDatabase<byte[]> getDbFromFile(String kInfoFile) {
-        KindleDatabase<byte[]> db = new KindleDatabase<>();
+    public Map<String, byte[]> getDbFromFile(String kInfoFile) {
+        Map<String, byte[]> db = new LinkedHashMap<>();
 
         // Read file content
         byte[] fileData;
         try (FileInputStream fileInputStream = new FileInputStream(kInfoFile)) {
             fileData = fileInputStream.readAllBytes();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.printf("Error reading file %s%n", kInfoFile);
             return db;
         }
 
@@ -324,7 +323,7 @@ final class KindleKeyWindows extends KindleKey {
                 if (clearText != null && clearText.length > 0) db.put(keyName, clearText);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.printf("Error occurred while decrypting key file '%s' with IDString '%s' and UserName '%s': %s%n", kInfoFile, new String(getIdString()), new String(getUsername()), e.getMessage());
         }
 
         if (db.size() > 6) {

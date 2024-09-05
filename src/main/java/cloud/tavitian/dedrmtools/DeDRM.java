@@ -141,7 +141,7 @@ public final class DeDRM {
 
         for (String kDatabaseFile : kDatabaseFiles) {
             try {
-                KindleDatabase<String> kindleDatabase = new KindleDatabase<>(kDatabaseFile);
+                KindleDatabase kindleDatabase = new KindleDatabase(kDatabaseFile);
                 KDatabaseRecord kDatabaseRecord = new KDatabaseRecord(kDatabaseFile, kindleDatabase);
                 kDatabaseRecords.add(kDatabaseRecord);
             } catch (IOException e) {

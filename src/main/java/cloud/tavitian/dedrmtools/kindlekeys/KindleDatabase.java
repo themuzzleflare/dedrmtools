@@ -7,7 +7,10 @@ package cloud.tavitian.dedrmtools.kindlekeys;
 import cloud.tavitian.dedrmtools.Debug;
 import com.google.gson.Gson;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
@@ -19,7 +22,7 @@ import static cloud.tavitian.dedrmtools.Util.hexStringToByteArray;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.encode;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.encodeHash;
 
-public class KindleDatabase<V> extends LinkedHashMap<String, V> {
+public class KindleDatabase extends LinkedHashMap<String, String> {
     private static final Gson gson = new Gson();
 
     private static final String kindleAccountTokensKey = "kindle.account.tokens";
@@ -77,22 +80,24 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
         super();
     }
 
-    public KindleDatabase(File file) throws FileNotFoundException {
+    public KindleDatabase(File file) throws IOException {
         this(file.getAbsolutePath());
     }
 
-    public KindleDatabase(String filename) throws FileNotFoundException {
+    public KindleDatabase(String filename) throws IOException {
         super();
         putAll(loadFromFile(filename));
     }
 
-    public static <V> KindleDatabase<V> loadFromFile(File file) throws FileNotFoundException {
+    public static KindleDatabase loadFromFile(File file) throws IOException {
         return loadFromFile(file.getAbsolutePath());
     }
 
-    public static <V> KindleDatabase<V> loadFromFile(String filename) throws FileNotFoundException {
+    public static KindleDatabase loadFromFile(String filename) throws IOException {
         FileReader fileReader = new FileReader(filename);
-        return gson.fromJson(fileReader, KindleDatabase.class);
+        KindleDatabase result = gson.fromJson(fileReader, KindleDatabase.class);
+        fileReader.close();
+        return result;
     }
 
     public void writeToFile(File file) throws IOException {
@@ -105,59 +110,59 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
         fileWriter.close();
     }
 
-    public V getKindleAccountToken() {
+    public String getKindleAccountToken() {
         return get(kindleAccountTokensKey);
     }
 
-    public V getDSN() {
+    public String getDSN() {
         return get(dsnKey);
     }
 
-    public V getMazamaRandomNumber() {
+    public String getMazamaRandomNumber() {
         return get(mazamaRandomNumberKey);
     }
 
-    public V getSerialNumber() {
+    public String getSerialNumber() {
         return get(serialNumberKey);
     }
 
-    public V getIDString() {
+    public String getIDString() {
         return get(idStringKey);
     }
 
-    public V getUsernameHash() {
+    public String getUsernameHash() {
         return get(usernameHashKey);
     }
 
-    public V getUserName() {
+    public String getUserName() {
         return get(userNameKey);
     }
 
-    public V getKindleAccountTokenOrDefault(V defaultValue) {
+    public String getKindleAccountTokenOrDefault(String defaultValue) {
         return getOrDefault(kindleAccountTokensKey, defaultValue);
     }
 
-    public V getDSNOrDefault(V defaultValue) {
+    public String getDSNOrDefault(String defaultValue) {
         return getOrDefault(dsnKey, defaultValue);
     }
 
-    public V getMazamaRandomNumberOrDefault(V defaultValue) {
+    public String getMazamaRandomNumberOrDefault(String defaultValue) {
         return getOrDefault(mazamaRandomNumberKey, defaultValue);
     }
 
-    public V getSerialNumberOrDefault(V defaultValue) {
+    public String getSerialNumberOrDefault(String defaultValue) {
         return getOrDefault(serialNumberKey, defaultValue);
     }
 
-    public V getIDStringOrDefault(V defaultValue) {
+    public String getIDStringOrDefault(String defaultValue) {
         return getOrDefault(idStringKey, defaultValue);
     }
 
-    public V getUsernameHashOrDefault(V defaultValue) {
+    public String getUsernameHashOrDefault(String defaultValue) {
         return getOrDefault(usernameHashKey, defaultValue);
     }
 
-    public V getUserNameOrDefault(V defaultValue) {
+    public String getUserNameOrDefault(String defaultValue) {
         return getOrDefault(userNameKey, defaultValue);
     }
 
@@ -191,79 +196,37 @@ public class KindleDatabase<V> extends LinkedHashMap<String, V> {
 
     public byte[] getKindleAccountTokenBytes() {
         Debug.printf("Got Kindle Account Token: %s%n", getKindleAccountToken());
-
-        V token = getKindleAccountToken();
-
-        if (token instanceof String string) return hexStringToByteArray(string);
-        else if (token instanceof byte[] bytes) return bytes;
-
-        return null;
+        return hexStringToByteArray(getKindleAccountToken());
     }
 
     public byte[] getDSNBytes() {
         Debug.printf("Got DSN: %s%n", getDSN());
-
-        V dsn = getDSN();
-
-        if (dsn instanceof String string) return hexStringToByteArray(string);
-        else if (dsn instanceof byte[] bytes) return bytes;
-
-        return null;
+        return hexStringToByteArray(getDSN());
     }
 
     public byte[] getMazamaRandomNumberBytes() {
         Debug.printf("Got MazamaRandomNumber: %s%n", getMazamaRandomNumber());
-
-        V mazamaRandomNumber = getMazamaRandomNumber();
-
-        if (mazamaRandomNumber instanceof String string) return hexStringToByteArray(string);
-        else if (mazamaRandomNumber instanceof byte[] bytes) return bytes;
-
-        return null;
+        return hexStringToByteArray(getMazamaRandomNumber());
     }
 
     public byte[] getSerialNumberBytes() {
         Debug.printf("Got SerialNumber: %s%n", getSerialNumber());
-
-        V serialNumber = getSerialNumber();
-
-        if (serialNumber instanceof String string) return hexStringToByteArray(string);
-        else if (serialNumber instanceof byte[] bytes) return bytes;
-
-        return null;
+        return hexStringToByteArray(getSerialNumber());
     }
 
     public byte[] getIDStringBytes() {
         Debug.printf("Got IDString: %s%n", getIDString());
-
-        V idString = getIDString();
-
-        if (idString instanceof String string) return hexStringToByteArray(string);
-        else if (idString instanceof byte[] bytes) return bytes;
-
-        return null;
+        return hexStringToByteArray(getIDString());
     }
 
     public byte[] getUsernameHashBytes() {
         Debug.printf("Got UsernameHash: %s%n", getUsernameHash());
-
-        V usernameHash = getUsernameHash();
-
-        if (usernameHash instanceof String string) return hexStringToByteArray(string);
-        else if (usernameHash instanceof byte[] bytes) return bytes;
-
-        return null;
+        return hexStringToByteArray(getUsernameHash());
     }
 
     public byte[] getUserNameBytes() {
         Debug.printf("Got UserName: %s%n", getUserName());
-
-        V userName = getUserName();
-
-        if (userName instanceof String string) return hexStringToByteArray(string);
-        else if (userName instanceof byte[] bytes) return bytes;
-
-        return null;
+        return hexStringToByteArray(getUserName());
     }
 
     public byte[] getKindleAccountTokenBytesOrDefault(byte[] defaultValue) {

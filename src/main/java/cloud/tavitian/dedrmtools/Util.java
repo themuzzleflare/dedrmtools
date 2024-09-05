@@ -193,4 +193,8 @@ public final class Util {
 
         return -1; // Returns -1 if the byte is not found in the array
     }
+
+    public static String[] toStringArray(List<String> list) {
+        return list.toArray(new String[0]);
+    }
 }

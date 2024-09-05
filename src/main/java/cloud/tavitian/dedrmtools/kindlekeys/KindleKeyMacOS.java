@@ -4,17 +4,22 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
-import cloud.tavitian.dedrmtools.BytesList;
+import cloud.tavitian.dedrmtools.BytesSet;
 import cloud.tavitian.dedrmtools.Debug;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,16 +28,15 @@ import static cloud.tavitian.dedrmtools.CharMaps.testMap8;
 import static cloud.tavitian.dedrmtools.CryptoUtils.aesctrdecrypt;
 import static cloud.tavitian.dedrmtools.CryptoUtils.pbkdf2hmacsha1;
 import static cloud.tavitian.dedrmtools.HashUtils.sha256;
-import static cloud.tavitian.dedrmtools.Util.concatenateArrays;
-import static cloud.tavitian.dedrmtools.Util.formatByteArray;
+import static cloud.tavitian.dedrmtools.Util.*;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.*;
 
 final class KindleKeyMacOS extends KindleKey {
     private static final byte[] charMap2 = "ZB0bYyc1xDdW2wEV3Ff7KkPpL8UuGA4gz-Tme9Nn_tHh5SvXCsIiR6rJjQaqlOoM".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] charMap5 = charMap2;
 
-    private static List<byte[]> getMacAddressesMunged() {
-        List<byte[]> macNums = new BytesList();
+    private static Set<byte[]> getMacAddressesMunged() {
+        Set<byte[]> macNums = new BytesSet();
 
         String macNum = System.getenv("MYMACNUM");
 
@@ -40,7 +44,7 @@ final class KindleKeyMacOS extends KindleKey {
         if (macNum != null) macNums.add(macNum.getBytes(StandardCharsets.UTF_8));
 
         // Command to list all hardware ports on macOS
-        String command = "networksetup -listallhardwareports";
+        String[] command = {"/usr/sbin/networksetup", "-listallhardwareports"};
 
         try {
             // Execute the command
@@ -82,7 +86,7 @@ final class KindleKeyMacOS extends KindleKey {
 
             reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.printf("Error retrieving MAC addresses: %s%n", e.getMessage());
         }
 
         Debug.printf("MAC addresses munged: %s%n", macNums);
@@ -90,20 +94,34 @@ final class KindleKeyMacOS extends KindleKey {
         return macNums;
     }
 
-    private static List<byte[]> getVolumesSerialNumbers() {
-        List<byte[]> serNums = new BytesList();
+    private static Set<byte[]> getVolumeSerialNumbers() {
+        Set<byte[]> serNums = new BytesSet();
 
         String serNum = System.getenv("MYSERIALNUMBER");
 
         // Add MYSERIALNUMBER environment variable if it's set
-        if (serNum != null) serNums.add(serNum.trim().getBytes(StandardCharsets.UTF_8));
+        if (serNum != null && !serNum.isEmpty()) serNums.add(serNum.trim().getBytes(StandardCharsets.UTF_8));
 
+        getVolumeSerialNumbersViaIoreg(serNums);
+        getVolumeSerialNumbersViaSystemProfiler(serNums);
+
+        Debug.printf("Volume serial numbers: %s%n", serNums);
+
+        return serNums;
+    }
+
+    private static void getVolumeSerialNumbersViaIoreg(Set<byte[]> serNums) {
         // Command to get the hard drive serial numbers using ioreg
-        String command = "/usr/sbin/ioreg -w 0 -r -c AppleAHCIDiskDriver";
+        List<String> command = new ArrayList<>(Arrays.asList("/usr/sbin/ioreg", "-w", "0", "-r"));
+
+        for (String storageDriveClass : IORegStorageDriveClasses.all) {
+            command.add("-c");
+            command.add(storageDriveClass);
+        }
 
         try {
             // Execute the command
-            Process process = Runtime.getRuntime().exec(command);
+            Process process = Runtime.getRuntime().exec(toStringArray(command));
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
 
@@ -122,19 +140,45 @@ final class KindleKeyMacOS extends KindleKey {
 
             reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.printf("Error retrieving volume serial numbers via ioreg: %s%n", e.getMessage());
         }
-
-        Debug.printf("Volume serial numbers: %s%n", serNums);
-
-        return serNums;
     }
 
-    private static List<byte[]> getDiskPartitionNames() {
-        List<byte[]> names = new BytesList();
+    private static void getVolumeSerialNumbersViaSystemProfiler(Set<byte[]> serNums) {
+        // Command to get the hard drive serial numbers using ioreg
+        List<String> command = new ArrayList<>(List.of("/usr/sbin/system_profiler"));
+
+        command.addAll(SystemProfilerStorageDriveDataTypes.all);
+
+        try {
+            // Execute the command
+            Process process = Runtime.getRuntime().exec(toStringArray(command));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+
+            // Read the output line by line
+            while ((line = reader.readLine()) != null) {
+                int pp = line.indexOf("Serial Number: ");
+
+                if (pp >= 0) {
+                    // Extract the serial number and process it
+                    String serial = line.substring(pp + 15).trim();
+                    // Remove the trailing quotation mark if present
+                    serNums.add(serial.getBytes(StandardCharsets.UTF_8));
+                }
+            }
+
+            reader.close();
+        } catch (IOException e) {
+            System.err.printf("Error retrieving volume serial numbers via system_profiler: %s%n", e.getMessage());
+        }
+    }
+
+    private static Set<byte[]> getDiskPartitionNames() {
+        Set<byte[]> names = new BytesSet();
 
         // Command to list mounted partitions
-        String command = "/sbin/mount";
+        String[] command = {"/sbin/mount"};
 
         try {
             // Execute the command
@@ -148,6 +192,7 @@ final class KindleKeyMacOS extends KindleKey {
                 if (line.startsWith("/dev")) {
                     // Split the line into device part and mount path
                     String[] parts = line.split(" on ");
+
                     if (parts.length > 0) {
                         // Extract the partition name by removing the "/dev" prefix
                         String partitionName = parts[0].substring(5);
@@ -158,7 +203,7 @@ final class KindleKeyMacOS extends KindleKey {
 
             reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.printf("Error retrieving disk partition names: %s%n", e.getMessage());
         }
 
         Debug.printf("Disk partition names: %s%n", names);
@@ -166,8 +211,8 @@ final class KindleKeyMacOS extends KindleKey {
         return names;
     }
 
-    private static List<byte[]> getDiskPartitionUUIDs() {
-        List<byte[]> uuids = new BytesList();
+    private static Set<byte[]> getDiskPartitionUUIDs() {
+        Set<byte[]> uuids = new BytesSet();
 
         String uuidNum = System.getenv("MYUUIDNUMBER");
 
@@ -175,7 +220,7 @@ final class KindleKeyMacOS extends KindleKey {
         if (uuidNum != null) uuids.add(uuidNum.trim().getBytes(StandardCharsets.UTF_8));
 
         // Command to get UUIDs of all disk partitions
-        String command = "/usr/sbin/ioreg -l -S -w 0 -r -c AppleAHCIDiskDriver";
+        String[] command = {"/usr/sbin/ioreg", "-l", "-S", "-w", "0", "-r", "-c", "AppleAHCIDiskDriver", "-c", "AppleANS3NVMeController"};
 
         try {
             // Execute the command
@@ -198,7 +243,7 @@ final class KindleKeyMacOS extends KindleKey {
 
             reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.printf("Error retrieving disk partition UUIDs: %s%n", e.getMessage());
         }
 
         Debug.printf("Disk partition UUIDs: %s%n", uuids);
@@ -206,13 +251,13 @@ final class KindleKeyMacOS extends KindleKey {
         return uuids;
     }
 
-    private static List<byte[]> getIdStrings() {
+    private static Set<byte[]> getIdStrings() {
         // Return all possible ID Strings
-        List<byte[]> strings = new BytesList();
+        Set<byte[]> strings = new BytesSet();
 
         // Extend the list with results from various methods
         strings.addAll(getMacAddressesMunged());
-        strings.addAll(getVolumesSerialNumbers());
+        strings.addAll(getVolumeSerialNumbers());
         strings.addAll(getDiskPartitionNames());
         strings.addAll(getDiskPartitionUUIDs());
 
@@ -224,7 +269,7 @@ final class KindleKeyMacOS extends KindleKey {
         return strings;
     }
 
-    private static void checkAndAddFile(KindlePath testPath, List<String> kInfoFiles) {
+    private static void checkAndAddFile(KindlePath testPath, Set<String> kInfoFiles) {
         File file = new File(testPath.path());
 
         if (file.exists()) {
@@ -244,15 +289,15 @@ final class KindleKeyMacOS extends KindleKey {
     }
 
     @Override
-    public List<String> getKindleInfoFiles() {
+    public Set<String> getKindleInfoFiles() {
         // List to store found paths
-        List<String> kInfoFiles = new ArrayList<>();
+        Set<String> kInfoFiles = new LinkedHashSet<>();
 
         // Get the HOME environment variable
         String home = System.getenv("HOME");
 
         // List of known paths to check for the Kindle info files
-        List<KindlePath> pathsToCheck = KindlePath.getKindlePathsMac(home);
+        Set<KindlePath> pathsToCheck = KindlePath.getKindlePathsMac(home);
 
         // Check each path to see if the file exists
         for (KindlePath testPath : pathsToCheck) checkAndAddFile(testPath, kInfoFiles);
@@ -265,15 +310,15 @@ final class KindleKeyMacOS extends KindleKey {
     }
 
     @Override
-    public KindleDatabase<byte[]> getDbFromFile(String kInfoFile) {
-        KindleDatabase<byte[]> db = new KindleDatabase<>();
+    public Map<String, byte[]> getDbFromFile(String kInfoFile) {
+        Map<String, byte[]> db = new LinkedHashMap<>();
 
         // Read file content
         byte[] fileData;
         try (FileInputStream fileInputStream = new FileInputStream(kInfoFile)) {
             fileData = fileInputStream.readAllBytes();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.printf("Error reading file: %s%n", e.getMessage());
             return db;
         }
 
@@ -281,7 +326,7 @@ final class KindleKeyMacOS extends KindleKey {
 
         List<String> items;
 
-        List<byte[]> idStrings = getIdStrings();
+        Set<byte[]> idStrings = getIdStrings();
 
         System.out.printf("trying username %s on file %s%n", new String(getUsername()), kInfoFile);
 
@@ -419,7 +464,7 @@ final class KindleKeyMacOS extends KindleKey {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.printf("Error occurred while decrypting key file '%s' with IDString '%s' and UserName '%s': %s%n", kInfoFile, new String(idString), new String(getUsername()), e.getMessage());
             }
         }
 
@@ -438,45 +483,35 @@ final class KindleKeyMacOS extends KindleKey {
     }
 
     private class CryptUnprotectData {
-        private byte[] key;
-        private byte[] iv;
-        private Cipher crp;
+        private final byte[] key;
+        private final byte[] iv;
+        private final Cipher crp;
 
-        public CryptUnprotectData(byte[] entropy, byte[] idString) {
-            try {
-                // Concatenate username and id_string with the specific pattern
-                byte[] sp = concatenateArrays(getUsername(), "+@#$%+".getBytes(StandardCharsets.UTF_8), idString);
+        public CryptUnprotectData(byte[] entropy, byte[] idString) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+            // Concatenate username and id_string with the specific pattern
+            byte[] sp = concatenateArrays(getUsername(), "+@#$%+".getBytes(StandardCharsets.UTF_8), idString);
 
-                // Encode using SHA-256 and custom character map (placeholder for your encode method)
-                byte[] passwdData = encode(sha256(sp), charMap2);
+            // Encode using SHA-256 and custom character map (placeholder for your encode method)
+            byte[] passwdData = encode(sha256(sp), charMap2);
 
-                // Use PBKDF2 with SHA-1 to derive the key and IV
-                byte[] salt = entropy;
-                byte[] keyIv = pbkdf2hmacsha1(passwdData, salt, 0x800, 0x400);
+            // Use PBKDF2 with SHA-1 to derive the key and IV
+            byte[] salt = entropy;
+            byte[] keyIv = pbkdf2hmacsha1(passwdData, salt, 0x800, 0x400);
 
-                // Split the derived data into key and IV
-                this.key = Arrays.copyOfRange(keyIv, 0, 32);
-                this.iv = Arrays.copyOfRange(keyIv, 32, 48);
+            // Split the derived data into key and IV
+            this.key = Arrays.copyOfRange(keyIv, 0, 32);
+            this.iv = Arrays.copyOfRange(keyIv, 32, 48);
 
-                // Initialize the cipher for decryption
-                this.crp = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                this.crp.init(Cipher.DECRYPT_MODE, new SecretKeySpec(this.key, "AES"), new IvParameterSpec(this.iv));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            // Initialize the cipher for decryption
+            this.crp = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            this.crp.init(Cipher.DECRYPT_MODE, new SecretKeySpec(this.key, "AES"), new IvParameterSpec(this.iv));
         }
 
-        public byte[] decrypt(byte[] encryptedData) {
-            try {
-                // Decrypt the data using the initialized cipher
-                byte[] cleartext = this.crp.doFinal(encryptedData);
+        public byte[] decrypt(byte[] encryptedData) throws IllegalBlockSizeException, BadPaddingException {
+            // Decrypt the data using the initialized cipher
+            byte[] cleartext = this.crp.doFinal(encryptedData);
 
-                return decode(cleartext, charMap2);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
+            return decode(cleartext, charMap2);
         }
     }
 }
