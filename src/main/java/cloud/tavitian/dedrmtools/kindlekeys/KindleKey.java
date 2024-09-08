@@ -14,8 +14,7 @@ import java.util.*;
 
 import static cloud.tavitian.dedrmtools.CryptoUtils.aescbcdecrypt;
 import static cloud.tavitian.dedrmtools.CryptoUtils.pbkdf2hmacsha1;
-import static cloud.tavitian.dedrmtools.Util.byteArrayToHexString;
-import static cloud.tavitian.dedrmtools.Util.formatByteArray;
+import static cloud.tavitian.dedrmtools.Util.*;
 
 public abstract class KindleKey implements KindleKeyManager {
     private static final String osName = System.getProperty("os.name").toLowerCase();
@@ -75,7 +74,7 @@ public abstract class KindleKey implements KindleKeyManager {
 
     Set<KindleDatabase> kindleKeys(Set<String> files) {
         // If files is null, retrieve the Kindle info files
-        if (files == null || files.isEmpty()) files = getKindleInfoFiles();
+        if (practicalIsEmpty(files)) files = getKindleInfoFiles();
 
         Set<KindleDatabase> keys = new LinkedHashSet<>();
 
@@ -107,7 +106,7 @@ public abstract class KindleKey implements KindleKeyManager {
 
     public boolean getKey(String outpath, Set<String> files) {
         // Check if files list is null, and initialize it if necessary
-        if (files == null) files = Set.of();  // Creates an empty list
+        files = sanitiseSet(files);
 
         // Retrieve Kindle keys using the kindleKeys method
         Set<KindleDatabase> keys = kindleKeys(files);

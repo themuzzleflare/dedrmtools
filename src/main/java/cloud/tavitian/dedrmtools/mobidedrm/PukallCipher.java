@@ -19,7 +19,7 @@ final class PukallCipher {
     public static byte[] pc1(byte[] key, byte[] src, boolean decryption) throws Exception {
         validateKeyLength(key);
 
-        int[] wkey = initializeWKey(key);
+        int[] wkey = initialiseWKey(key);
         byte[] dst = new byte[src.length];
 
         processSourceArray(src, decryption, wkey, dst);
@@ -31,7 +31,7 @@ final class PukallCipher {
         if (key.length != KEY_LENGTH) throw new Exception("PC1: Bad key length");
     }
 
-    private static int[] initializeWKey(byte[] key) {
+    private static int[] initialiseWKey(byte[] key) {
         int[] wkey = new int[KEY_COMPONENTS];
 
         for (int i = 0; i < KEY_COMPONENTS; i++)

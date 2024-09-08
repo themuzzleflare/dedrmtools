@@ -207,7 +207,7 @@ public final class MobiBook extends Book {
                 }
             }
         } catch (Exception e) {
-            System.out.printf("Cannot set metaArray: Error: %s%n", e.getMessage());
+            System.err.printf("Cannot set metaArray: Error: %s%n", e.getMessage());
         }
     }
 
@@ -519,8 +519,8 @@ public final class MobiBook extends Book {
         // Normalise PID list
         Set<String> goodPids = normalisePids(pidSet);
 
-        Debug.println(String.format("PIDs: %s", pidSet));
-        Debug.println(String.format("Good PIDs: %s", goodPids));
+        Debug.printf("PIDs: %s%n", pidSet);
+        Debug.printf("Good PIDs: %s%n", goodPids);
 
         byte[] foundKey;
         String pid;

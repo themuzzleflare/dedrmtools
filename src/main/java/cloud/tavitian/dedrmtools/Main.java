@@ -6,7 +6,7 @@ package cloud.tavitian.dedrmtools;
 
 import java.util.Set;
 
-import static cloud.tavitian.dedrmtools.Util.commaSeparatedStringToSet;
+import static cloud.tavitian.dedrmtools.Util.commaSeparatedStringToSanitisedSet;
 
 public final class Main {
     public static void main(String[] args) {
@@ -23,9 +23,12 @@ public final class Main {
         Set<String> serials = null;
 
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-k") || args[i].equals("--database")) kdatabases = commaSeparatedStringToSet(args[++i]);
-            else if (args[i].equals("-p") || args[i].equals("--pid")) pids = commaSeparatedStringToSet(args[++i]);
-            else if (args[i].equals("-s") || args[i].equals("--serial")) serials = commaSeparatedStringToSet(args[++i]);
+            if (args[i].equals("-k") || args[i].equals("--database"))
+                kdatabases = commaSeparatedStringToSanitisedSet(args[++i]);
+            else if (args[i].equals("-p") || args[i].equals("--pid"))
+                pids = commaSeparatedStringToSanitisedSet(args[++i]);
+            else if (args[i].equals("-s") || args[i].equals("--serial"))
+                serials = commaSeparatedStringToSanitisedSet(args[++i]);
             else if (args[i].equals("-v") || args[i].equals("--verbose")) Debug.setEnabled(true);
             else if (args[i].equals("-h") || args[i].equals("--help")) {
                 usage();

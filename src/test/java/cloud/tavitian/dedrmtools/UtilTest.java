@@ -135,12 +135,13 @@ final class UtilTest {
     }
 
     @Test
-    void commaSeparatedStringToSet() {
+    void commaSeparatedStringToSanitisedSet() {
         String str1 = "a,b,c";
         String str2 = "a, b, c";
         String str3 = "a, b, c, ";
         String str4 = "a,a,b,c,c,d,e,f,f,g";
         String str5 = "d, z, e, f, o ,p";
+        String str6 = "a,,z,q, ,,l";
 
         for (int i = 0; i < 1000; i++) {
             Set<String> expectedSet1 = new LinkedHashSet<>() {{
@@ -181,17 +182,26 @@ final class UtilTest {
                 add("p");
             }};
 
-            Set<String> set1 = Util.commaSeparatedStringToSet(str1);
-            Set<String> set2 = Util.commaSeparatedStringToSet(str2);
-            Set<String> set3 = Util.commaSeparatedStringToSet(str3);
-            Set<String> set4 = Util.commaSeparatedStringToSet(str4);
-            Set<String> set5 = Util.commaSeparatedStringToSet(str5);
+            Set<String> expectedSet6 = new LinkedHashSet<>() {{
+                add("a");
+                add("z");
+                add("q");
+                add("l");
+            }};
+
+            Set<String> set1 = Util.commaSeparatedStringToSanitisedSet(str1);
+            Set<String> set2 = Util.commaSeparatedStringToSanitisedSet(str2);
+            Set<String> set3 = Util.commaSeparatedStringToSanitisedSet(str3);
+            Set<String> set4 = Util.commaSeparatedStringToSanitisedSet(str4);
+            Set<String> set5 = Util.commaSeparatedStringToSanitisedSet(str5);
+            Set<String> set6 = Util.commaSeparatedStringToSanitisedSet(str6);
 
             assertEquals(expectedSet1, set1);
             assertEquals(expectedSet2, set2);
             assertEquals(expectedSet3, set3);
             assertEquals(expectedSet4, set4);
             assertEquals(expectedSet5, set5);
+            assertEquals(expectedSet6, set6);
         }
     }
 }

@@ -7,7 +7,7 @@ package cloud.tavitian.dedrmtools;
 import java.io.IOException;
 import java.util.Set;
 
-import static cloud.tavitian.dedrmtools.Util.commaSeparatedStringToSet;
+import static cloud.tavitian.dedrmtools.Util.commaSeparatedStringToSanitisedSet;
 import static cloud.tavitian.dedrmtools.Util.toSet;
 
 public abstract class Book implements BookManager, BookCleanup {
@@ -28,7 +28,7 @@ public abstract class Book implements BookManager, BookCleanup {
      * @throws Exception if an error occurs
      */
     public void processBook(String pids) throws Exception {
-        processBook(commaSeparatedStringToSet(pids));
+        processBook(commaSeparatedStringToSanitisedSet(pids));
     }
 
     public void cleanup() {

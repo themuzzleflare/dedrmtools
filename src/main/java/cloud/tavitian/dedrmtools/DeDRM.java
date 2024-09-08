@@ -23,8 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static cloud.tavitian.dedrmtools.CharMaps.*;
-import static cloud.tavitian.dedrmtools.Util.commaSeparatedStringToSet;
-import static cloud.tavitian.dedrmtools.Util.copyright;
+import static cloud.tavitian.dedrmtools.Util.*;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindlePID.getPidSet;
 
 public final class DeDRM {
@@ -81,36 +80,20 @@ public final class DeDRM {
 
         while (matcher.find()) {
             String match = matcher.group();
-            String replacement = match;
+            String replacement;
 
             if (match.startsWith("&#")) {
-                // Character reference
-                try {
-                    // Hexadecimal character reference
-                    // Decimal character reference
-                    if (match.startsWith("&#x"))
-                        replacement = String.valueOf((char) Integer.parseInt(match.substring(3, match.length() - 1), 16));
-                    else replacement = String.valueOf((char) Integer.parseInt(match.substring(2, match.length() - 1)));
-                } catch (NumberFormatException ignored) {
-                }
-            } else {
-                // Named entity
-                try {
-                    replacement = StringEscapeUtils.unescapeHtml4(match);
-                } catch (Exception ignored) {
-                }
-            }
+                if (match.startsWith("&#x"))
+                    replacement = String.valueOf((char) Integer.parseInt(match.substring(3, match.length() - 1), 16));
+                else replacement = String.valueOf((char) Integer.parseInt(match.substring(2, match.length() - 1)));
+            } else replacement = StringEscapeUtils.unescapeHtml4(match);
 
             matcher.appendReplacement(result, replacement);
         }
 
         matcher.appendTail(result);
-        return result.toString();
-    }
 
-    private static Set<String> sanitiseStringSet(Set<String> set) {
-        if (set == null || set.isEmpty() || set.stream().allMatch(String::isEmpty)) return Collections.emptySet();
-        else return set;
+        return result.toString();
     }
 
     private static String calculateOutfileName(String filename, String booktitle) {
@@ -137,7 +120,7 @@ public final class DeDRM {
     private static Set<KDatabaseRecord> loadKDatabaseRecords(Set<String> kDatabaseFiles) {
         Set<KDatabaseRecord> kDatabaseRecords = new LinkedHashSet<>();
 
-        if (sanitiseStringSet(kDatabaseFiles).isEmpty()) return kDatabaseRecords;
+        if (practicalIsEmpty(kDatabaseFiles)) return kDatabaseRecords;
 
         for (String kDatabaseFile : kDatabaseFiles) {
             try {
@@ -240,9 +223,9 @@ public final class DeDRM {
     }
 
     public static void decryptBook(String infile, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {
-        kDatabaseFiles = sanitiseStringSet(kDatabaseFiles);
-        serials = sanitiseStringSet(serials);
-        pids = sanitiseStringSet(pids);
+        kDatabaseFiles = sanitiseSet(kDatabaseFiles);
+        serials = sanitiseSet(serials);
+        pids = sanitiseSet(pids);
 
         long startTime = System.currentTimeMillis();
 
@@ -260,9 +243,9 @@ public final class DeDRM {
     public static void decryptBooks(Set<String> infiles, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {
         long startTime = System.currentTimeMillis();
 
-        kDatabaseFiles = sanitiseStringSet(kDatabaseFiles);
-        serials = sanitiseStringSet(serials);
-        pids = sanitiseStringSet(pids);
+        kDatabaseFiles = sanitiseSet(kDatabaseFiles);
+        serials = sanitiseSet(serials);
+        pids = sanitiseSet(pids);
 
         System.out.printf("K4MobiDeDrm v%s.%n%s.%n", version, copyright);
         System.out.println("Removes DRM protection from Mobipocket, Amazon KF8, Amazon Print Replica, and Amazon Topaz eBooks.");
@@ -285,7 +268,7 @@ public final class DeDRM {
     }
 
     public static void decryptBook(String infile, String outdir, String kdatabases, String serials, String pids) {
-        decryptBook(infile, outdir, commaSeparatedStringToSet(kdatabases), commaSeparatedStringToSet(serials), commaSeparatedStringToSet(pids));
+        decryptBook(infile, outdir, commaSeparatedStringToSanitisedSet(kdatabases), commaSeparatedStringToSanitisedSet(serials), commaSeparatedStringToSanitisedSet(pids));
     }
 
     public static void decryptBookWithSerial(String infile, String outdir, Set<String> serials) {
@@ -293,7 +276,7 @@ public final class DeDRM {
     }
 
     public static void decryptBookWithSerial(String infile, String outdir, String serials) {
-        decryptBook(infile, outdir, Collections.emptySet(), commaSeparatedStringToSet(serials), Collections.emptySet());
+        decryptBook(infile, outdir, Collections.emptySet(), commaSeparatedStringToSanitisedSet(serials), Collections.emptySet());
     }
 
     public static void decryptBookWithPid(String infile, String outdir, Set<String> pids) {
@@ -301,7 +284,7 @@ public final class DeDRM {
     }
 
     public static void decryptBookWithPid(String infile, String outdir, String pids) {
-        decryptBook(infile, outdir, Collections.emptySet(), Collections.emptySet(), commaSeparatedStringToSet(pids));
+        decryptBook(infile, outdir, Collections.emptySet(), Collections.emptySet(), commaSeparatedStringToSanitisedSet(pids));
     }
 
     public static void decryptBookWithKDatabase(String infile, String outdir, Set<String> kdatabases) {
@@ -309,7 +292,7 @@ public final class DeDRM {
     }
 
     public static void decryptBookWithKDatabase(String infile, String outdir, String kdatabases) {
-        decryptBook(infile, outdir, commaSeparatedStringToSet(kdatabases), Collections.emptySet(), Collections.emptySet());
+        decryptBook(infile, outdir, commaSeparatedStringToSanitisedSet(kdatabases), Collections.emptySet(), Collections.emptySet());
     }
 
     public static void decryptBookWithKDatabaseAndSerial(String infile, String outdir, Set<String> kdatabases, Set<String> serials) {
@@ -317,10 +300,10 @@ public final class DeDRM {
     }
 
     public static void decryptBookWithKDatabaseAndSerial(String infile, String outdir, String kdatabases, String serials) {
-        decryptBook(infile, outdir, commaSeparatedStringToSet(kdatabases), commaSeparatedStringToSet(serials), Collections.emptySet());
+        decryptBook(infile, outdir, commaSeparatedStringToSanitisedSet(kdatabases), commaSeparatedStringToSanitisedSet(serials), Collections.emptySet());
     }
 
     public static void decryptBooksWithKDatabaseAndSerial(Set<String> infiles, String outdir, String kdatabases, String serials) {
-        decryptBooks(infiles, outdir, commaSeparatedStringToSet(kdatabases), commaSeparatedStringToSet(serials), Collections.emptySet());
+        decryptBooks(infiles, outdir, commaSeparatedStringToSanitisedSet(kdatabases), commaSeparatedStringToSanitisedSet(serials), Collections.emptySet());
     }
 }
