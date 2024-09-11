@@ -222,6 +222,11 @@ public final class DeDRM {
         }
     }
 
+    public static void generateKeyfileThrowing(String outpath) throws Exception {
+        KindleKey instance = KindleKey.getInstance();
+        instance.getKeyThrowing(outpath);
+    }
+
     public static void decryptBook(String infile, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {
         kDatabaseFiles = sanitiseSet(kDatabaseFiles);
         serials = sanitiseSet(serials);
@@ -238,6 +243,21 @@ public final class DeDRM {
             decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, startTime);
         } catch (Exception ignored) {
         }
+    }
+
+    public static void decryptBookThrowing(String infile, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) throws Exception {
+        kDatabaseFiles = sanitiseSet(kDatabaseFiles);
+        serials = sanitiseSet(serials);
+        pids = sanitiseSet(pids);
+
+        long startTime = System.currentTimeMillis();
+
+        System.out.printf("K4MobiDeDrm v%s.%n%s.%n", version, copyright);
+        System.out.println("Removes DRM protection from Mobipocket, Amazon KF8, Amazon Print Replica, and Amazon Topaz eBooks.");
+
+        Set<KDatabaseRecord> kDatabaseRecords = loadKDatabaseRecords(kDatabaseFiles);
+
+        decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, startTime);
     }
 
     public static void decryptBooks(Set<String> infiles, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {
@@ -301,6 +321,10 @@ public final class DeDRM {
 
     public static void decryptBookWithKDatabaseAndSerial(String infile, String outdir, String kdatabases, String serials) {
         decryptBook(infile, outdir, commaSeparatedStringToSanitisedSet(kdatabases), commaSeparatedStringToSanitisedSet(serials), Collections.emptySet());
+    }
+
+    public static void decryptBookWithKDatabaseAndSerialThrowing(String infile, String outdir, String kdatabases, String serials) throws Exception {
+        decryptBookThrowing(infile, outdir, commaSeparatedStringToSanitisedSet(kdatabases), commaSeparatedStringToSanitisedSet(serials), Collections.emptySet());
     }
 
     public static void decryptBooksWithKDatabaseAndSerial(Set<String> infiles, String outdir, String kdatabases, String serials) {

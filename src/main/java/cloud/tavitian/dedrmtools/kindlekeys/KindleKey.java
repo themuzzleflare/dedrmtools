@@ -104,6 +104,10 @@ public abstract class KindleKey implements KindleKeyManager {
         return getKey(outpath, null);
     }
 
+    public void getKeyThrowing(String outpath) throws IOException {
+        getKeyThrowing(outpath, null);
+    }
+
     public boolean getKey(String outpath, Set<String> files) {
         // Check if files list is null, and initialize it if necessary
         files = sanitiseSet(files);
@@ -154,5 +158,57 @@ public abstract class KindleKey implements KindleKeyManager {
         }
 
         return false;
+    }
+
+    public void getKeyThrowing(String outpath, Set<String> files) throws IOException {
+        // Check if files list is null, and initialize it if necessary
+        files = sanitiseSet(files);
+
+        // Retrieve Kindle keys using the kindleKeys method
+        Set<KindleDatabase> keys = kindleKeys(files);
+
+        if (!keys.isEmpty()) {
+            File outFile = new File(outpath);
+
+            // Check if the output path is a directory or a file
+            if (!outFile.isDirectory()) {
+                // If it's not a directory, assume it's a file path
+                try {
+                    // Write the first key to the specified file
+                    keys.iterator().next().writeToFile(outFile);
+                    System.out.printf("Saved a key to %s%n", outFile.getAbsolutePath());
+                } catch (IOException e) {
+                    System.err.printf("Error saving key to file: %s%n", e.getMessage());
+                    throw e;
+                }
+            } else {
+                // If it's a directory, save each key to a separate file with a unique name
+                int keyCount = 0;
+
+                for (KindleDatabase key : keys) {
+                    while (true) {
+                        keyCount++;
+                        String outfile = Paths.get(outpath, String.format("kindlekey%d.k4i", keyCount)).toString();
+
+                        // Check if the file already exists
+                        if (!new File(outfile).exists()) {
+                            try {
+                                key.writeToFile(outfile);
+                                System.out.printf("Saved a key to %s%n", outfile);
+                            } catch (IOException e) {
+                                System.err.printf("Error saving key to file: %s%n", e.getMessage());
+                                throw e;
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return;
+        }
+
+        throw new IOException("No keys found");
     }
 }

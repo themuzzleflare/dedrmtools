@@ -16,6 +16,10 @@ final class PukallCipher {
     private PukallCipher() {
     }
 
+    public static byte[] pc1(byte[] key, byte[] src) throws Exception {
+        return pc1(key, src, true);
+    }
+
     public static byte[] pc1(byte[] key, byte[] src, boolean decryption) throws Exception {
         validateKeyLength(key);
 

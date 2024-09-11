@@ -171,6 +171,26 @@ public final class Util {
         return result;
     }
 
+    public static byte[] byteListToByteArray(List<Byte> list) {
+        if (list == null) return new byte[0];
+
+        byte[] data = new byte[list.size()];
+
+        for (int i = 0; i < list.size(); i++) data[i] = list.get(i);
+
+        return data;
+    }
+
+    public static List<Byte> toByteList(byte[] data) {
+        if (data == null) return Collections.emptyList();
+
+        List<Byte> list = new ArrayList<>();
+
+        for (byte b : data) list.add(b);
+
+        return list;
+    }
+
     public static int ord(byte[] data) {
         return ord(data[0]);
     }

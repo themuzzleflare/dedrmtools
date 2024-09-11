@@ -20,6 +20,7 @@ import java.util.*;
 import static cloud.tavitian.dedrmtools.CharMaps.*;
 import static cloud.tavitian.dedrmtools.Util.*;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.checksumPid;
+import static cloud.tavitian.dedrmtools.mobidedrm.PukallCipher.pc1;
 
 public final class MobiBook extends Book {
     private static final String version = "3.0";
@@ -211,14 +212,6 @@ public final class MobiBook extends Book {
         }
     }
 
-    private static byte[] pc1(byte[] key, byte[] src, boolean decryption) throws Exception {
-        return PukallCipher.pc1(key, src, decryption);
-    }
-
-    private static byte[] pc1(byte[] key, byte[] src) throws Exception {
-        return pc1(key, src, true);
-    }
-
     private static int getSizeOfTrailingDataEntries(byte[] ptr, int size, int flags) {
         int num = 0, testflags = flags >> 1;
 
@@ -360,6 +353,24 @@ public final class MobiBook extends Book {
         return new DRMInfo(foundKey, foundPid);
     }
 
+    private static Set<String> normalisePids(Set<String> pidSet) throws IOException {
+        Set<String> goodPids = new LinkedHashSet<>();
+
+        for (String pid : pidSet) {
+            if (pid.length() == 10) {
+                String substring = pid.substring(0, 8);
+
+                if (!checksumPid(substring, letters).equals(pid))
+                    System.out.printf("Warning: PID %s has an incorrect checksum, should have been %s%n", pid, checksumPid(substring, letters));
+
+                goodPids.add(substring);
+            } else if (pid.length() == 8) goodPids.add(pid);
+            else System.out.printf("Warning: PID %s has the wrong number of digits%n", pid);
+        }
+
+        return goodPids;
+    }
+
     /**
      * @param section The section index to load
      * @return The byte array of the section
@@ -427,7 +438,7 @@ public final class MobiBook extends Book {
                 int val = ByteBuffer.wrap(rec209, i + 1, 4).getInt();
                 byte[] sval = metaArray.getOrDefault(val, new byte[0]);
 
-                for (byte b : sval) tokenStream.write(b);
+                tokenStream.writeBytes(sval);
             }
         }
 
@@ -611,23 +622,5 @@ public final class MobiBook extends Book {
         mobiData = outputStream.toByteArray();
 
         System.out.println(" done");
-    }
-
-    private Set<String> normalisePids(Set<String> pidSet) throws IOException {
-        Set<String> goodPids = new LinkedHashSet<>();
-
-        for (String pid : pidSet) {
-            if (pid.length() == 10) {
-                String substring = pid.substring(0, 8);
-
-                if (!checksumPid(substring, letters).equals(pid))
-                    System.out.printf("Warning: PID %s has an incorrect checksum, should have been %s%n", pid, checksumPid(substring, letters));
-
-                goodPids.add(substring);
-            } else if (pid.length() == 8) goodPids.add(pid);
-            else System.out.printf("Warning: PID %s has the wrong number of digits%n", pid);
-        }
-
-        return goodPids;
     }
 }
