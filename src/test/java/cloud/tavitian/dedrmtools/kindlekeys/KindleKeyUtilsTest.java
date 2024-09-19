@@ -12,18 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class KindleKeyUtilsTest {
     @Test
-    void encode() {
-    }
-
-    @Test
-    void encodeHash() {
-    }
-
-    @Test
-    void decode() {
-    }
-
-    @Test
     void crc32() {
         byte[] pid1 = "vCNIml/c".getBytes(StandardCharsets.US_ASCII);
         byte[] pid2 = "JBJfi+Wm".getBytes(StandardCharsets.US_ASCII);
@@ -48,9 +36,5 @@ final class KindleKeyUtilsTest {
         assertEquals(crc323Expected, crc323);
         assertEquals(crc324Expected, crc324);
         assertEquals(crc325Expected, crc325);
-    }
-
-    @Test
-    void checksumPid() {
     }
 }

@@ -5,6 +5,7 @@
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
 import cloud.tavitian.dedrmtools.Book;
+import cloud.tavitian.dedrmtools.Debug;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -141,6 +142,8 @@ public final class KFXZipBook extends Book {
 
         System.out.printf("Decrypting KFX DRM voucher: %s%n", voucherFilename);
 
+        Debug.printf("PIDs: %s%n", pidSet);
+
         outerLoop:
         for (String pid : pidSet) {
             for (int[] lengths : new int[][]{{0, 0}, {16, 0}, {16, 40}, {32, 0}, {32, 40}, {40, 0}, {40, 40}}) {
@@ -153,6 +156,9 @@ public final class KFXZipBook extends Book {
                     String accountSecret = pid.substring(dsn_len);
 
                     try {
+                        Debug.printf("DSN: %s%n", dsn);
+                        Debug.printf("Account secret: %s%n", accountSecret);
+
                         DRMIonVoucher voucher = new DRMIonVoucher(new BytesIOInputStream(voucherData), dsn, accountSecret);
                         voucher.parse();
                         voucher.decryptVoucher();

@@ -14,9 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 final class UtilTest {
     @Test
     void formatByteArray() {
-        byte[] bytes1 = new byte[]{(byte) 0xEA, 'D', 'R', 'M', 'I', 'O', 'N', (byte) 0xEE};
-        byte[] bytes2 = new byte[]{'T', 'P', 'Z'};
-        byte[] bytes3 = new byte[]{'P', 'K', 0x03, 0x04};
+        byte[] bytes1 = {(byte) 0xEA, 'D', 'R', 'M', 'I', 'O', 'N', (byte) 0xEE};
+        byte[] bytes2 = {'T', 'P', 'Z'};
+        byte[] bytes3 = {'P', 'K', 0x03, 0x04};
 
         String expected1 = "b'\\xeaDRMION\\xee'";
         String expected2 = "b'TPZ'";
@@ -29,70 +29,6 @@ final class UtilTest {
         assertEquals(expected1, result1);
         assertEquals(expected2, result2);
         assertEquals(expected3, result3);
-    }
-
-    @Test
-    void ljustBytes() {
-    }
-
-    @Test
-    void sumBytes() {
-    }
-
-    @Test
-    void indexOfNullByte() {
-    }
-
-    @Test
-    void hexStringToByteArray() {
-    }
-
-    @Test
-    void concatenateArrays() {
-    }
-
-    @Test
-    void toIntegerArray() {
-    }
-
-    @Test
-    void toIntegerList() {
-    }
-
-    @Test
-    void testToIntegerList() {
-    }
-
-    @Test
-    void toByteArray() {
-    }
-
-    @Test
-    void testToByteArray() {
-    }
-
-    @Test
-    void testToByteArray1() {
-    }
-
-    @Test
-    void ord() {
-    }
-
-    @Test
-    void testOrd() {
-    }
-
-    @Test
-    void ordList() {
-    }
-
-    @Test
-    void contains() {
-    }
-
-    @Test
-    void testContains() {
     }
 
     @Test

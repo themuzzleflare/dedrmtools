@@ -35,7 +35,7 @@ final class KindleKeyMacOS extends KindleKey {
     private static final byte[] charMap2 = "ZB0bYyc1xDdW2wEV3Ff7KkPpL8UuGA4gz-Tme9Nn_tHh5SvXCsIiR6rJjQaqlOoM".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] charMap5 = charMap2;
 
-    private static Set<byte[]> getMacAddressesMunged() {
+    static Set<byte[]> getMacAddressesMunged() {
         Set<byte[]> macNums = new BytesSet();
 
         String macNum = System.getenv("MYMACNUM");
