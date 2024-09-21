@@ -50,7 +50,7 @@ final class IonUtils {
 
     // Version Marker
     // python: VERSION_MARKER = [b"\x01", b"\x00", b"\xEA"]
-    public static final byte[][] VERSION_MARKER = new byte[][]{new byte[]{0x01}, new byte[]{0x00}, new byte[]{(byte) 0xEA}};
+    public static final byte[][] VERSION_MARKER = {{0x01}, {0x00}, {(byte) 0xEA}};
 
     public static final List<String> SYM_NAMES = new ArrayList<>(Arrays.asList(
             "com.amazon.drm.Envelope@1.0",
@@ -92,38 +92,6 @@ final class IonUtils {
     public static void addProtTable(BinaryIonParser ion) {
         ion.addToCatalog("ProtectedData", 1, SYM_NAMES);
     }
-
-    private static byte[] pkcs7Pad(byte[] msg, int blockLen) {
-        int paddingLen = blockLen - (msg.length % blockLen);
-        byte padding = (byte) paddingLen;
-        byte[] paddingBytes = new byte[paddingLen];
-        Arrays.fill(paddingBytes, padding);
-
-        byte[] paddedMsg = new byte[msg.length + paddingLen];
-        System.arraycopy(msg, 0, paddedMsg, 0, msg.length);
-        System.arraycopy(paddingBytes, 0, paddedMsg, msg.length, paddingLen);
-
-        return paddedMsg;
-    }
-
-    private static byte[] pkcs7Unpad(byte[] msg, int blocklen) throws Exception {
-        if (msg.length % blocklen != 0)
-            throw new IllegalArgumentException("Message length is not a multiple of block size");
-
-        int paddinglen = msg[msg.length - 1] & 0xFF; // Convert the signed byte to an unsigned int
-
-        if (paddinglen == 0 || paddinglen > blocklen) throw new Exception("Incorrect padding - Wrong key");
-
-        byte[] expectedPadding = new byte[paddinglen];
-        Arrays.fill(expectedPadding, (byte) paddinglen);
-
-        byte[] actualPadding = Arrays.copyOfRange(msg, msg.length - paddinglen, msg.length);
-
-        if (!Arrays.equals(expectedPadding, actualPadding)) throw new Exception("Incorrect padding - Wrong key");
-
-        return Arrays.copyOfRange(msg, 0, msg.length - paddinglen);
-    }
-
 
     public static byte[] obfuscate(byte[] secret, int version) throws NoSuchAlgorithmException {
         if (version == 1) {

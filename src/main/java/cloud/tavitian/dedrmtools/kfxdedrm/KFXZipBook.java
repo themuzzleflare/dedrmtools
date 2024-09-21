@@ -5,6 +5,7 @@
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
 import cloud.tavitian.dedrmtools.Book;
+import cloud.tavitian.dedrmtools.BookFile;
 import cloud.tavitian.dedrmtools.Debug;
 
 import java.io.ByteArrayOutputStream;
@@ -39,7 +40,8 @@ public final class KFXZipBook extends Book {
 
     @Override
     public String getBookTitle() {
-        return Paths.get(infile).getFileName().toString().replaceFirst("[.][^.]+$", "");
+        BookFile bookFile = new BookFile(infile);
+        return bookFile.getRoot();
     }
 
     @Override

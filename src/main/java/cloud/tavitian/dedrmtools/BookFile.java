@@ -7,7 +7,7 @@ package cloud.tavitian.dedrmtools;
 import java.io.File;
 import java.net.URI;
 
-final class BookFile extends File {
+public final class BookFile extends File {
     public BookFile(String pathname) {
         super(pathname);
     }
