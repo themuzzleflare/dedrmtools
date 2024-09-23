@@ -4,5 +4,6 @@
 
 package cloud.tavitian.dedrmtools;
 
+@SuppressWarnings("unused")
 final class DeDRMTest {
 }

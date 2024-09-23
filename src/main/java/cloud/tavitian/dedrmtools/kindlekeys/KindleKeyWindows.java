@@ -31,10 +31,13 @@ import static cloud.tavitian.dedrmtools.Util.formatByteArray;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.*;
 
 final class KindleKeyWindows extends KindleKey {
+    @SuppressWarnings("unused")
     private static final byte[] charMap2 = "AaZzB0bYyCc1XxDdW2wEeVv3FfUuG4g-TtHh5SsIiR6rJjQq7KkPpL8lOoMm9Nn_".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] charMap5 = "AzB0bYyCeVvaZ3FfUuG4g-TtHh5SsIiR6rJjQq7KkPpL8lOoMm9Nn_c1XxDdW2wE".getBytes(StandardCharsets.US_ASCII);
 
+    private static final byte[] charMap5 = "AzB0bYyCeVvaZ3FfUuG4g-TtHh5SsIiR6rJjQq7KkPpL8lOoMm9Nn_c1XxDdW2wE".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] testMap1 = "n5Pr6St7Uv8Wx9YzAb0Cd1Ef2Gh3Jk4M".getBytes(StandardCharsets.US_ASCII);
+
+    @SuppressWarnings("unused")
     private static final byte[] testMap6 = "9YzAb0Cd1Ef2n5Pr6St7Uvh3Jk4M8WxG".getBytes(StandardCharsets.US_ASCII);
 
     private static String getSystemDirectory() {
@@ -69,7 +72,7 @@ final class KindleKeyWindows extends KindleKey {
         return serialnum;
     }
 
-    private static byte[] cryptUnprotectData(byte[] data, byte[] entropy, int flags) {
+    private static byte[] cryptUnprotectData(byte[] data, byte[] entropy, @SuppressWarnings("SameParameterValue") int flags) {
         DATA_BLOB inData = new DATA_BLOB();
         inData.pbData = new Memory(data.length);
         inData.cbData = data.length;
@@ -89,6 +92,7 @@ final class KindleKeyWindows extends KindleKey {
         return outData.pbData.getByteArray(0, outData.cbData);
     }
 
+    @SuppressWarnings("unused")
     private static String getEnvironmentVariable(String name) {
         char[] buffer = new char[256];
         int size = Kernel32.INSTANCE.GetEnvironmentVariableW(name, buffer, buffer.length);
@@ -158,10 +162,10 @@ final class KindleKeyWindows extends KindleKey {
                                 "Local AppData");
 
                         if (!new File(path).isDirectory()) path = "";
-                    } catch (Exception ignored) {
+                    } catch (Exception _) {
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception _) {
             }
         }
 
@@ -203,7 +207,7 @@ final class KindleKeyWindows extends KindleKey {
         List<String> items = new ArrayList<>(Arrays.asList(new String(data).split("/")));
 
         // starts with an encoded and encrypted header blob
-        String headerblob = items.remove(0);
+        String headerblob = items.removeFirst();
         byte[] encryptedValue = decode(headerblob.getBytes(), testMap1);
 
         try {
@@ -249,7 +253,7 @@ final class KindleKeyWindows extends KindleKey {
 
             // Process each item
             while (!items.isEmpty()) {
-                String item = items.remove(0);
+                String item = items.removeFirst();
                 byte[] keyHash = item.substring(0, 32).getBytes(StandardCharsets.UTF_8);
                 byte[] srcnt = decode(item.substring(34).getBytes(), charMap5);
 
@@ -262,7 +266,7 @@ final class KindleKeyWindows extends KindleKey {
                 ByteArrayOutputStream edlst = new ByteArrayOutputStream();
 
                 for (int i = 0; i < rcnt; i++) {
-                    String record = items.remove(0);
+                    String record = items.removeFirst();
                     edlst.write(record.getBytes(StandardCharsets.UTF_8));
                 }
 
@@ -284,7 +288,7 @@ final class KindleKeyWindows extends KindleKey {
                 Debug.printf("encdata: %s%n", formatByteArray(encdata));
 
                 List<Integer> primesList = primes(encdata.length / 3);
-                int noffset = encdata.length - primesList.get(primesList.size() - 1);
+                int noffset = encdata.length - primesList.getLast();
                 byte[] pfx = Arrays.copyOfRange(encdata, 0, noffset);
                 byte[] suffix = Arrays.copyOfRange(encdata, noffset, encdata.length);
 

@@ -15,23 +15,23 @@ final class MobiBookTest {
     @Test
     void getPidMetaInfo() throws Exception {
         // from test resources folder
-        String book1 = ClassLoader.getSystemResource("einkbookfiles/1.azw3").getPath();
-        String book2 = ClassLoader.getSystemResource("einkbookfiles/2.azw3").getPath();
-        String book3 = ClassLoader.getSystemResource("einkbookfiles/3.azw3").getPath();
-        String book4 = ClassLoader.getSystemResource("einkbookfiles/4.azw3").getPath();
-        String book5 = ClassLoader.getSystemResource("einkbookfiles/5.azw3").getPath();
+        final String book1 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/1.azw3")).getPath();
+        final String book2 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/2.azw3")).getPath();
+        final String book3 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/3.azw3")).getPath();
+        final String book4 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/4.azw3")).getPath();
+        final String book5 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/5.azw3")).getPath();
 
-        MobiBook mobiBook1 = new MobiBook(book1);
-        MobiBook mobiBook2 = new MobiBook(book2);
-        MobiBook mobiBook3 = new MobiBook(book3);
-        MobiBook mobiBook4 = new MobiBook(book4);
-        MobiBook mobiBook5 = new MobiBook(book5);
+        final MobiBook mobiBook1 = new MobiBook(book1);
+        final MobiBook mobiBook2 = new MobiBook(book2);
+        final MobiBook mobiBook3 = new MobiBook(book3);
+        final MobiBook mobiBook4 = new MobiBook(book4);
+        final MobiBook mobiBook5 = new MobiBook(book5);
 
-        PIDMetaInfo pidMetaInfo1 = mobiBook1.getPidMetaInfo();
-        PIDMetaInfo pidMetaInfo2 = mobiBook2.getPidMetaInfo();
-        PIDMetaInfo pidMetaInfo3 = mobiBook3.getPidMetaInfo();
-        PIDMetaInfo pidMetaInfo4 = mobiBook4.getPidMetaInfo();
-        PIDMetaInfo pidMetaInfo5 = mobiBook5.getPidMetaInfo();
+        final PIDMetaInfo pidMetaInfo1 = mobiBook1.getPidMetaInfo();
+        final PIDMetaInfo pidMetaInfo2 = mobiBook2.getPidMetaInfo();
+        final PIDMetaInfo pidMetaInfo3 = mobiBook3.getPidMetaInfo();
+        final PIDMetaInfo pidMetaInfo4 = mobiBook4.getPidMetaInfo();
+        final PIDMetaInfo pidMetaInfo5 = mobiBook5.getPidMetaInfo();
 
         byte[] token1 = {97, 116, 118, 58, 107, 105, 110, 58, 50, 58, 87, 98, 86, 80, 116, 54, 109, 69, 69, 68, 109, 69, 55, 115, 80, 98, 117, 98, 107, 83, 87, 48, 105, 112, 107, 82, 82, 52, 47, 72, 66, 114, 85, 68, 82, 121, 75, 115, 75, 47, 112, 76, 114, 76, 112, 86, 79, 118, 108, 55, 65, 108, 72, 90, 122, 110, 85, 83, 43, 81, 71, 43, 117, 121, 69, 68, 76, 48, 47, 82, 111, 117, 100, 106, 107, 81, 86, 72, 66, 119, 75, 120, 98, 71, 114, 78, 78, 66, 51, 100, 101, 122, 116, 78, 110, 52, 74, 83, 86, 110, 52, 106, 66, 99, 90, 98, 70, 101, 51, 83, 66, 54, 102, 69, 103, 88, 76, 116, 117, 69, 105, 114, 98, 50, 79, 80, 74, 77, 56, 57, 105, 75, 113, 66, 67, 107, 85, 72, 99, 73, 69, 77, 69, 115, 115, 108, 105, 106, 81, 79, 79, 115, 90, 87, 55, 98, 83, 102, 77, 65, 47, 118, 47, 117, 72, 109, 80, 88, 110, 89, 52, 61, 58, 86, 83, 57, 77, 101, 97, 82, 43, 74, 49, 83, 67, 48, 88, 107, 79, 87, 82, 53, 69, 113, 47, 105, 104, 121, 117, 119, 61, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -53,25 +53,25 @@ final class MobiBookTest {
     @Test
     void processBook() throws Exception {
         // read non-DRM books from test resources folder
-        byte[] noDrmBook1 = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("einkbookfilesnodrm/1.azw3")).readAllBytes();
-        byte[] noDrmBook2 = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("einkbookfilesnodrm/2.azw3")).readAllBytes();
-        byte[] noDrmBook3 = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("einkbookfilesnodrm/3.azw3")).readAllBytes();
-        byte[] noDrmBook4 = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("einkbookfilesnodrm/4.azw3")).readAllBytes();
-        byte[] noDrmBook5 = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("einkbookfilesnodrm/5.azw3")).readAllBytes();
+        final byte[] noDrmBook1 = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("einkbookfilesnodrm/1.azw3")).readAllBytes();
+        final byte[] noDrmBook2 = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("einkbookfilesnodrm/2.azw3")).readAllBytes();
+        final byte[] noDrmBook3 = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("einkbookfilesnodrm/3.azw3")).readAllBytes();
+        final byte[] noDrmBook4 = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("einkbookfilesnodrm/4.azw3")).readAllBytes();
+        final byte[] noDrmBook5 = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("einkbookfilesnodrm/5.azw3")).readAllBytes();
 
         // retrieve the paths for the test books
-        String book1 = ClassLoader.getSystemResource("einkbookfiles/1.azw3").getPath();
-        String book2 = ClassLoader.getSystemResource("einkbookfiles/2.azw3").getPath();
-        String book3 = ClassLoader.getSystemResource("einkbookfiles/3.azw3").getPath();
-        String book4 = ClassLoader.getSystemResource("einkbookfiles/4.azw3").getPath();
-        String book5 = ClassLoader.getSystemResource("einkbookfiles/5.azw3").getPath();
+        final String book1 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/1.azw3")).getPath();
+        final String book2 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/2.azw3")).getPath();
+        final String book3 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/3.azw3")).getPath();
+        final String book4 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/4.azw3")).getPath();
+        final String book5 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/5.azw3")).getPath();
 
         // instantiate classes
-        MobiBook mobiBook1 = new MobiBook(book1);
-        MobiBook mobiBook2 = new MobiBook(book2);
-        MobiBook mobiBook3 = new MobiBook(book3);
-        MobiBook mobiBook4 = new MobiBook(book4);
-        MobiBook mobiBook5 = new MobiBook(book5);
+        final MobiBook mobiBook1 = new MobiBook(book1);
+        final MobiBook mobiBook2 = new MobiBook(book2);
+        final MobiBook mobiBook3 = new MobiBook(book3);
+        final MobiBook mobiBook4 = new MobiBook(book4);
+        final MobiBook mobiBook5 = new MobiBook(book5);
 
         // process the books
         mobiBook1.processBook("vCNIml/cF7");

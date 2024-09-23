@@ -25,7 +25,7 @@ import static cloud.tavitian.dedrmtools.CharMaps.*;
 import static cloud.tavitian.dedrmtools.Util.contains;
 
 public final class KFXZipBook extends Book {
-    private static final String version = "2.0";
+    private static final String VERSION = "2.0";
 
     private final String infile;
     private final KFXDecryptedDictionary decrypted = new KFXDecryptedDictionary();
@@ -33,7 +33,7 @@ public final class KFXZipBook extends Book {
 
     public KFXZipBook(String infile) {
         super();
-        System.out.printf("KFXDeDRM v%s.%n", version);
+        System.out.printf("KFXDeDRM v%s.%n", VERSION);
         System.out.println("Removes DRM protection from KFX-ZIP and KFX eBooks.");
         this.infile = infile;
     }
@@ -111,7 +111,7 @@ public final class KFXZipBook extends Book {
     private void decryptVoucher(Set<String> pidSet) throws Exception {
         String voucherFilename = null;
         byte[] voucherData = null;
-        boolean decrypted = false;
+        boolean decryptionSucceeded = false;
         DRMIonVoucher decryptedVoucher = null;
 
         try (FileInputStream fis = new FileInputStream(infile);
@@ -161,20 +161,21 @@ public final class KFXZipBook extends Book {
                         Debug.printf("DSN: %s%n", dsn);
                         Debug.printf("Account secret: %s%n", accountSecret);
 
-                        DRMIonVoucher voucher = new DRMIonVoucher(new BytesIOInputStream(voucherData), dsn, accountSecret);
-                        voucher.parse();
-                        voucher.decryptVoucher();
+                        DRMIonVoucher localVoucher = new DRMIonVoucher(new BytesIOInputStream(voucherData), dsn, accountSecret);
+                        localVoucher.parse();
+                        localVoucher.decryptVoucher();
 
-                        decrypted = true;
-                        decryptedVoucher = voucher;
+                        decryptionSucceeded = true;
+                        decryptedVoucher = localVoucher;
                         break outerLoop; // Break out of both loops if successful
-                    } catch (Exception ignored) {
+                    } catch (Exception _) {
                     }
                 }
             }
         }
 
-        if (!decrypted) throw new Exception("Failed to decrypt KFX DRM voucher with any key");
+        if (!decryptionSucceeded)
+            throw new Exception("Failed to decrypt KFX DRM voucher with any key");
 
         System.out.println("KFX DRM voucher successfully decrypted");
 

@@ -40,6 +40,7 @@ final class DRMIonVoucher {
         addProtTable(envelope);
     }
 
+    @SuppressWarnings("unused")
     public DRMIonVoucher(BytesIOInputStream voucherenv, byte[] dsn, byte[] secret) {
         this.dsn = dsn;
         this.secret = secret;
@@ -61,13 +62,17 @@ final class DRMIonVoucher {
 
         // Step 2: Add lock parameters to the shared secret
         for (String param : lockParams) {
-            if ("ACCOUNT_SECRET".equals(param)) {
-                sharedBuilder.write(param.getBytes(StandardCharsets.US_ASCII));
-                sharedBuilder.write(secret);
-            } else if ("CLIENT_ID".equals(param)) {
-                sharedBuilder.write(param.getBytes(StandardCharsets.US_ASCII));
-                sharedBuilder.write(dsn);
-            } else throw new Exception(String.format("Unknown lock parameter: %s", param));
+            switch (param) {
+                case "ACCOUNT_SECRET" -> {
+                    sharedBuilder.write(param.getBytes(StandardCharsets.US_ASCII));
+                    sharedBuilder.write(secret);
+                }
+                case "CLIENT_ID" -> {
+                    sharedBuilder.write(param.getBytes(StandardCharsets.US_ASCII));
+                    sharedBuilder.write(dsn);
+                }
+                default -> throw new Exception(String.format("Unknown lock parameter: %s", param));
+            }
         }
 
         byte[] shared = sharedBuilder.toByteArray();
@@ -134,13 +139,19 @@ final class DRMIonVoucher {
             while (drmKey.hasNext()) {
                 drmKey.next();
 
-                if ("algorithm".equals(drmKey.getFieldName())) {
-                    if (!"AES".equals(drmKey.stringValue()))
-                        throw new Exception(String.format("Unknown cipher algorithm: %s", drmKey.stringValue()));
-                } else if ("format".equals(drmKey.getFieldName())) {
-                    if (!"RAW".equals(drmKey.stringValue()))
-                        throw new Exception(String.format("Unknown key format: %s", drmKey.stringValue()));
-                } else if ("encoded".equals(drmKey.getFieldName())) secretKey = drmKey.lobValue();
+                if (null != drmKey.getFieldName()) switch (drmKey.getFieldName()) {
+                    case "algorithm" -> {
+                        if (!"AES".equals(drmKey.stringValue()))
+                            throw new Exception(String.format("Unknown cipher algorithm: %s", drmKey.stringValue()));
+                    }
+                    case "format" -> {
+                        if (!"RAW".equals(drmKey.stringValue()))
+                            throw new Exception(String.format("Unknown key format: %s", drmKey.stringValue()));
+                    }
+                    case "encoded" -> secretKey = drmKey.lobValue();
+                    default -> {
+                    }
+                }
             }
 
             drmKey.stepOut();
@@ -182,20 +193,22 @@ final class DRMIonVoucher {
                 envelope.next();
                 field = envelope.getFieldName();
 
-                if ("encryption_algorithm".equals(field)) encAlgorithm = envelope.stringValue();
-                else if ("encryption_transformation".equals(field)) encTransformation = envelope.stringValue();
-                else if ("hashing_algorithm".equals(field)) hashAlgorithm = envelope.stringValue();
-                else if ("lock_parameters".equals(field)) {
-                    envelope.stepIn();
+                if (null != field) switch (field) {
+                    case "encryption_algorithm" -> encAlgorithm = envelope.stringValue();
+                    case "encryption_transformation" -> encTransformation = envelope.stringValue();
+                    case "hashing_algorithm" -> hashAlgorithm = envelope.stringValue();
+                    case "lock_parameters" -> {
+                        envelope.stepIn();
+                        while (envelope.hasNext()) {
+                            if (envelope.next() != TID_STRING)
+                                throw new Exception("Expected string list for lock_parameters");
 
-                    while (envelope.hasNext()) {
-                        if (envelope.next() != TID_STRING)
-                            throw new Exception("Expected string list for lock_parameters");
-
-                        lockParams.add(envelope.stringValue());
+                            lockParams.add(envelope.stringValue());
+                        }
+                        envelope.stepOut();
                     }
-
-                    envelope.stepOut();
+                    default -> {
+                    }
                 }
             }
 
@@ -216,21 +229,22 @@ final class DRMIonVoucher {
         while (voucher.hasNext()) {
             voucher.next();
 
-            if ("cipher_iv".equals(voucher.getFieldName())) cipherIv = voucher.lobValue();
-            else if ("cipher_text".equals(voucher.getFieldName())) cipherText = voucher.lobValue();
-            else if ("license".equals(voucher.getFieldName())) {
-                if (!"com.amazon.drm.License@1.0".equals(voucher.getTypeName()))
-                    throw new Exception(String.format("Unknown license: %s", voucher.getTypeName()));
+            if (null != voucher.getFieldName()) switch (voucher.getFieldName()) {
+                case "cipher_iv" -> cipherIv = voucher.lobValue();
+                case "cipher_text" -> cipherText = voucher.lobValue();
+                case "license" -> {
+                    if (!"com.amazon.drm.License@1.0".equals(voucher.getTypeName()))
+                        throw new Exception(String.format("Unknown license: %s", voucher.getTypeName()));
+                    voucher.stepIn();
+                    while (voucher.hasNext()) {
+                        voucher.next();
 
-                voucher.stepIn();
-
-                while (voucher.hasNext()) {
-                    voucher.next();
-
-                    if ("license_type".equals(voucher.getFieldName())) licenceType = voucher.stringValue();
+                        if ("license_type".equals(voucher.getFieldName())) licenceType = voucher.stringValue();
+                    }
+                    voucher.stepOut();
                 }
-
-                voucher.stepOut();
+                default -> {
+                }
             }
         }
     }

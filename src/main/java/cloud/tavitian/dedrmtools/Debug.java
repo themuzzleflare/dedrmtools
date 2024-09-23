@@ -10,27 +10,30 @@ public final class Debug {
     private Debug() {
     }
 
-    public static <T> void println(T message) {
+    public static synchronized <T> void println(T message) {
         if (isEnabled) System.out.println(message);
     }
 
-    public static <T> void print(T message) {
+    @SuppressWarnings("unused")
+    public static synchronized <T> void print(T message) {
         if (isEnabled) System.out.print(message);
     }
 
-    public static void printf(String format, Object... args) {
+    public static synchronized void printf(String format, Object... args) {
         if (isEnabled) System.out.printf(format, args);
     }
 
-    public static void enable() {
+    @SuppressWarnings("unused")
+    public static synchronized void enable() {
         isEnabled = true;
     }
 
-    public static void disable() {
+    @SuppressWarnings("unused")
+    public static synchronized void disable() {
         isEnabled = false;
     }
 
-    public static void setEnabled(boolean debug) {
+    public static synchronized void setEnabled(boolean debug) {
         isEnabled = debug;
     }
 }

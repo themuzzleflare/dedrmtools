@@ -12,14 +12,17 @@ public final class BookFile extends File {
         super(pathname);
     }
 
+    @SuppressWarnings("unused")
     public BookFile(String parent, String child) {
         super(parent, child);
     }
 
+    @SuppressWarnings("unused")
     public BookFile(File parent, String child) {
         super(parent, child);
     }
 
+    @SuppressWarnings("unused")
     public BookFile(URI uri) {
         super(uri);
     }

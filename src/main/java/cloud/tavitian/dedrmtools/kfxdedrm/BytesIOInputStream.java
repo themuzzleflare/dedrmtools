@@ -11,12 +11,13 @@ final class BytesIOInputStream extends ByteArrayInputStream {
         super(buf);
     }
 
-    public int tell() {
+    public synchronized int tell() {
         return pos;
     }
 
-    public void seek(int position) {
+    public synchronized void seek(int position) {
         reset();
+        //noinspection ResultOfMethodCallIgnored
         skip(position);
     }
 }

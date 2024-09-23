@@ -5,6 +5,7 @@
 package cloud.tavitian.dedrmtools.kindlekeys;
 
 import java.io.ByteArrayOutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -55,7 +56,7 @@ public final class KindlePID {
     }
 
     // Generate the device PID
-    private static byte[] generateDevicePid(int[] table, byte[] dsn, int nbRoll) {
+    private static byte[] generateDevicePid(int[] table, byte[] dsn, @SuppressWarnings("SameParameterValue") int nbRoll) {
         // Generate the seed
         int seed = generatePidSeed(table, dsn);
 
@@ -113,7 +114,7 @@ public final class KindlePID {
         return outputStream.toByteArray();
     }
 
-    private static byte[] pidFromSerial(byte[] serial, int length) {
+    private static byte[] pidFromSerial(byte[] serial, @SuppressWarnings("SameParameterValue") int length) {
         int crc = (int) crc32(serial);
 
         // Initialise arr1 with length l and fill with zeros
@@ -183,7 +184,7 @@ public final class KindlePID {
 
         try {
             dsn = kDatabaseRecord.kindleDatabase().genDSN();
-        } catch (Exception ignored) {
+        } catch (NoSuchAlgorithmException _) {
             System.err.printf("Keys not found in the database %s.%n", kDatabaseRecord.dbFile());
             return pids;
         }
@@ -231,7 +232,6 @@ public final class KindlePID {
                 pids.addAll(k4Pids);
             } catch (Exception e) {
                 System.err.printf("Error getting PIDs from database %s: %s%n", kDatabaseRecord.dbFile(), e.getMessage());
-                e.printStackTrace();
             }
         }
 
@@ -241,7 +241,6 @@ public final class KindlePID {
                 pids.addAll(kindlePids);
             } catch (Exception e) {
                 System.err.printf("Error getting PIDs from serial number %s: %s%n", serial, e.getMessage());
-                e.printStackTrace();
             }
         }
 

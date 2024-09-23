@@ -7,7 +7,7 @@ package cloud.tavitian.dedrmtools;
 import java.util.*;
 
 public final class Util {
-    public static final String copyright = "Copyright © 2024 Paul Tavitian";
+    public static final String COPYRIGHT = "Copyright © 2024 Paul Tavitian";
 
     private Util() {
     }
@@ -171,6 +171,7 @@ public final class Util {
         return result;
     }
 
+    @SuppressWarnings("unused")
     public static byte[] byteListToByteArray(List<Byte> list) {
         if (list == null) return new byte[0];
 
@@ -181,6 +182,7 @@ public final class Util {
         return data;
     }
 
+    @SuppressWarnings("unused")
     public static List<Byte> toByteList(byte[] data) {
         if (data == null) return Collections.emptyList();
 
@@ -268,6 +270,7 @@ public final class Util {
 
     public static String[] toStringArray(List<String> list) {
         if (list == null) return new String[0]; // Return an empty array if the list is null
+
         return list.toArray(new String[0]); // Convert the list to an array
     }
 

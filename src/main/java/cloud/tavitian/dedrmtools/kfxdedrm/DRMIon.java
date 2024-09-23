@@ -55,64 +55,60 @@ final class DRMIon {
             while (ion.hasNext()) {
                 ion.next();
 
-                if ("com.amazon.drm.EnvelopeMetadata@1.0".equals(ion.getTypeName()) || "com.amazon.drm.EnvelopeMetadata@2.0".equals(ion.getTypeName())) {
-                    ion.stepIn();
+                if (null != ion.getTypeName()) switch (ion.getTypeName()) {
+                    case "com.amazon.drm.EnvelopeMetadata@1.0", "com.amazon.drm.EnvelopeMetadata@2.0" -> {
+                        ion.stepIn();
+                        while (ion.hasNext()) {
+                            ion.next();
 
-                    while (ion.hasNext()) {
-                        ion.next();
+                            if (!"encryption_voucher".equals(ion.getFieldName())) continue;
 
-                        if (!"encryption_voucher".equals(ion.getFieldName())) continue;
+                            if (voucherName.isEmpty()) {
+                                voucherName = ion.stringValue();
+                                key = voucher.getSecretKey();
 
-                        if (voucherName.isEmpty()) {
-                            voucherName = ion.stringValue();
-                            key = voucher.getSecretKey();
-
-                            if (key == null) throw new Exception("Unable to obtain secret key from voucher");
-                        } else {
-                            if (!voucherName.equals(ion.stringValue()))
-                                throw new Exception("Unexpected: Different vouchers required for same file?");
+                                if (key == null) throw new Exception("Unable to obtain secret key from voucher");
+                            } else {
+                                if (!voucherName.equals(ion.stringValue()))
+                                    throw new Exception("Unexpected: Different vouchers required for same file?");
+                            }
                         }
+                        ion.stepOut();
                     }
+                    case "com.amazon.drm.EncryptedPage@1.0", "com.amazon.drm.EncryptedPage@2.0" -> {
+                        boolean decompress = false;
+                        boolean decrypt = true;
+                        byte[] ct = null;
+                        byte[] civ = null;
+                        ion.stepIn();
+                        while (ion.hasNext()) {
+                            ion.next();
 
-                    ion.stepOut();
-                } else if ("com.amazon.drm.EncryptedPage@1.0".equals(ion.getTypeName()) || "com.amazon.drm.EncryptedPage@2.0".equals(ion.getTypeName())) {
-                    boolean decompress = false;
-                    boolean decrypt = true;
-                    byte[] ct = null;
-                    byte[] civ = null;
+                            if ("com.amazon.drm.Compressed@1.0".equals(ion.getTypeName())) decompress = true;
 
-                    ion.stepIn();
-
-                    while (ion.hasNext()) {
-                        ion.next();
-
-                        if ("com.amazon.drm.Compressed@1.0".equals(ion.getTypeName())) decompress = true;
-
-                        if ("cipher_text".equals(ion.getFieldName())) ct = ion.lobValue();
-                        else if ("cipher_iv".equals(ion.getFieldName())) civ = ion.lobValue();
+                            if ("cipher_text".equals(ion.getFieldName())) ct = ion.lobValue();
+                            else if ("cipher_iv".equals(ion.getFieldName())) civ = ion.lobValue();
+                        }
+                        if (ct != null && civ != null) processPage(ct, civ, outpages, decompress, decrypt);
+                        ion.stepOut();
                     }
+                    case "com.amazon.drm.PlainText@1.0", "com.amazon.drm.PlainText@2.0" -> {
+                        boolean decompress = false;
+                        boolean decrypt = false;
+                        byte[] plaintext = null;
+                        ion.stepIn();
+                        while (ion.hasNext()) {
+                            ion.next();
 
-                    if (ct != null && civ != null) processPage(ct, civ, outpages, decompress, decrypt);
+                            if ("com.amazon.drm.Compressed@1.0".equals(ion.getTypeName())) decompress = true;
 
-                    ion.stepOut();
-                } else if ("com.amazon.drm.PlainText@1.0".equals(ion.getTypeName()) || "com.amazon.drm.PlainText@2.0".equals(ion.getTypeName())) {
-                    boolean decompress = false;
-                    boolean decrypt = false;
-                    byte[] plaintext = null;
-
-                    ion.stepIn();
-
-                    while (ion.hasNext()) {
-                        ion.next();
-
-                        if ("com.amazon.drm.Compressed@1.0".equals(ion.getTypeName())) decompress = true;
-
-                        if ("data".equals(ion.getFieldName())) plaintext = ion.lobValue();
+                            if ("data".equals(ion.getFieldName())) plaintext = ion.lobValue();
+                        }
+                        if (plaintext != null) processPage(plaintext, null, outpages, decompress, decrypt);
+                        ion.stepOut();
                     }
-
-                    if (plaintext != null) processPage(plaintext, null, outpages, decompress, decrypt);
-
-                    ion.stepOut();
+                    default -> {
+                    }
                 }
             }
 

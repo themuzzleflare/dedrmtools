@@ -23,63 +23,64 @@ import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.encode;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.encodeHash;
 
 public class KindleDatabase extends LinkedHashMap<String, String> {
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
-    private static final String kindleAccountTokensKey = "kindle.account.tokens";
-    private static final String dsnKey = "DSN";
-    private static final String mazamaRandomNumberKey = "MazamaRandomNumber";
-    private static final String serialNumberKey = "SerialNumber";
-    private static final String idStringKey = "IDString";
-    private static final String usernameHashKey = "UsernameHash";
-    private static final String userNameKey = "UserName";
+    private static final String KINDLE_ACCOUNT_TOKENS_KEY = "kindle.account.tokens";
+    private static final String DSN_KEY = "DSN";
+    private static final String MAZAMA_RANDOM_NUMBER_KEY = "MazamaRandomNumber";
+    private static final String SERIAL_NUMBER_KEY = "SerialNumber";
+    private static final String ID_STRING_KEY = "IDString";
+    private static final String USERNAME_HASH_KEY = "UsernameHash";
+    private static final String USER_NAME_KEY = "UserName";
 
-    private static final String kindleCookieItemKey = "kindle.cookie.item";
-    private static final String eulaVersionAcceptedKey = "eulaVersionAccepted";
-    private static final String loginDateKey = "login_date";
-    private static final String kindleTokenItemKey = "kindle.token.item";
-    private static final String loginKey = "login";
-    private static final String kindleKeyItemKey = "kindle.key.item";
-    private static final String kindleNameInfoKey = "kindle.name.info";
-    private static final String kindleDeviceInfoKey = "kindle.device.info";
-    private static final String maxDateKey = "max_date";
-    private static final String sigVerifKey = "SIGVERIF";
-    private static final String buildVersionKey = "build_version";
-    private static final String kindleDirectedIDInfoKey = "kindle.directedid.info";
-    private static final String kindleAccountTypeInfoKey = "kindle.accounttype.info";
-    private static final String flashcardsPluginDataEncryptionKeyKey = "krx.flashcardsplugin.data.encryption_key";
-    private static final String notebookExportPluginDataEncryptionKeyKey = "krx.notebookexportplugin.data.encryption_key";
-    private static final String proxyHttpPasswordKey = "proxy.http.password";
-    private static final String proxyHttpUsernameKey = "proxy.http.username";
+    private static final String KINDLE_COOKIE_ITEM_KEY = "kindle.cookie.item";
+    private static final String EULA_VERSION_ACCEPTED_KEY = "eulaVersionAccepted";
+    private static final String LOGIN_DATE_KEY = "login_date";
+    private static final String KINDLE_TOKEN_ITEM_KEY = "kindle.token.item";
+    private static final String LOGIN_KEY = "login";
+    private static final String KINDLE_KEY_ITEM_KEY = "kindle.key.item";
+    private static final String KINDLE_NAME_INFO_KEY = "kindle.name.info";
+    private static final String KINDLE_DEVICE_INFO_KEY = "kindle.device.info";
+    private static final String MAX_DATE_KEY = "max_date";
+    private static final String SIG_VERIF_KEY = "SIGVERIF";
+    private static final String BUILD_VERSION_KEY = "build_version";
+    private static final String KINDLE_DIRECTED_ID_INFO_KEY = "kindle.directedid.info";
+    private static final String KINDLE_ACCOUNT_TYPE_INFO_KEY = "kindle.accounttype.info";
+    private static final String FLASHCARDS_PLUGIN_DATA_ENCRYPTION_KEY_KEY = "krx.flashcardsplugin.data.encryption_key";
+    private static final String NOTEBOOK_EXPORT_PLUGIN_DATA_ENCRYPTION_KEY_KEY = "krx.notebookexportplugin.data.encryption_key";
+    private static final String PROXY_HTTP_PASSWORD_KEY = "proxy.http.password";
+    private static final String PROXY_HTTP_USERNAME_KEY = "proxy.http.username";
 
     public static byte[][] keyBytesList = new byte[][]{
-            kindleAccountTokensKey.getBytes(StandardCharsets.US_ASCII),
-            kindleCookieItemKey.getBytes(StandardCharsets.US_ASCII),
-            eulaVersionAcceptedKey.getBytes(StandardCharsets.US_ASCII),
-            loginDateKey.getBytes(StandardCharsets.US_ASCII),
-            kindleTokenItemKey.getBytes(StandardCharsets.US_ASCII),
-            loginKey.getBytes(StandardCharsets.US_ASCII),
-            kindleKeyItemKey.getBytes(StandardCharsets.US_ASCII),
-            kindleNameInfoKey.getBytes(StandardCharsets.US_ASCII),
-            kindleDeviceInfoKey.getBytes(StandardCharsets.US_ASCII),
-            mazamaRandomNumberKey.getBytes(StandardCharsets.US_ASCII),
-            maxDateKey.getBytes(StandardCharsets.US_ASCII),
-            sigVerifKey.getBytes(StandardCharsets.US_ASCII),
-            buildVersionKey.getBytes(StandardCharsets.US_ASCII),
-            serialNumberKey.getBytes(StandardCharsets.US_ASCII),
-            usernameHashKey.getBytes(StandardCharsets.US_ASCII),
-            kindleDirectedIDInfoKey.getBytes(StandardCharsets.US_ASCII),
-            dsnKey.getBytes(StandardCharsets.US_ASCII),
-            kindleAccountTypeInfoKey.getBytes(StandardCharsets.US_ASCII),
-            flashcardsPluginDataEncryptionKeyKey.getBytes(StandardCharsets.US_ASCII),
-            notebookExportPluginDataEncryptionKeyKey.getBytes(StandardCharsets.US_ASCII),
-            proxyHttpPasswordKey.getBytes(StandardCharsets.US_ASCII),
-            proxyHttpUsernameKey.getBytes(StandardCharsets.US_ASCII)
+            KINDLE_ACCOUNT_TOKENS_KEY.getBytes(StandardCharsets.US_ASCII),
+            KINDLE_COOKIE_ITEM_KEY.getBytes(StandardCharsets.US_ASCII),
+            EULA_VERSION_ACCEPTED_KEY.getBytes(StandardCharsets.US_ASCII),
+            LOGIN_DATE_KEY.getBytes(StandardCharsets.US_ASCII),
+            KINDLE_TOKEN_ITEM_KEY.getBytes(StandardCharsets.US_ASCII),
+            LOGIN_KEY.getBytes(StandardCharsets.US_ASCII),
+            KINDLE_KEY_ITEM_KEY.getBytes(StandardCharsets.US_ASCII),
+            KINDLE_NAME_INFO_KEY.getBytes(StandardCharsets.US_ASCII),
+            KINDLE_DEVICE_INFO_KEY.getBytes(StandardCharsets.US_ASCII),
+            MAZAMA_RANDOM_NUMBER_KEY.getBytes(StandardCharsets.US_ASCII),
+            MAX_DATE_KEY.getBytes(StandardCharsets.US_ASCII),
+            SIG_VERIF_KEY.getBytes(StandardCharsets.US_ASCII),
+            BUILD_VERSION_KEY.getBytes(StandardCharsets.US_ASCII),
+            SERIAL_NUMBER_KEY.getBytes(StandardCharsets.US_ASCII),
+            USERNAME_HASH_KEY.getBytes(StandardCharsets.US_ASCII),
+            KINDLE_DIRECTED_ID_INFO_KEY.getBytes(StandardCharsets.US_ASCII),
+            DSN_KEY.getBytes(StandardCharsets.US_ASCII),
+            KINDLE_ACCOUNT_TYPE_INFO_KEY.getBytes(StandardCharsets.US_ASCII),
+            FLASHCARDS_PLUGIN_DATA_ENCRYPTION_KEY_KEY.getBytes(StandardCharsets.US_ASCII),
+            NOTEBOOK_EXPORT_PLUGIN_DATA_ENCRYPTION_KEY_KEY.getBytes(StandardCharsets.US_ASCII),
+            PROXY_HTTP_PASSWORD_KEY.getBytes(StandardCharsets.US_ASCII),
+            PROXY_HTTP_USERNAME_KEY.getBytes(StandardCharsets.US_ASCII)
     };
 
     public KindleDatabase() {
         super();
     }
 
+    @SuppressWarnings("unused")
     public KindleDatabase(File file) throws IOException {
         this(file.getAbsolutePath());
     }
@@ -89,13 +90,14 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
         putAll(loadFromFile(filename));
     }
 
+    @SuppressWarnings("unused")
     public static KindleDatabase loadFromFile(File file) throws IOException {
         return loadFromFile(file.getAbsolutePath());
     }
 
     public static KindleDatabase loadFromFile(String filename) throws IOException {
         FileReader fileReader = new FileReader(filename);
-        KindleDatabase result = gson.fromJson(fileReader, KindleDatabase.class);
+        KindleDatabase result = GSON.fromJson(fileReader, KindleDatabase.class);
         fileReader.close();
         return result;
     }
@@ -106,92 +108,99 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
 
     public void writeToFile(String filename) throws IOException {
         FileWriter fileWriter = new FileWriter(filename);
-        gson.toJson(this, fileWriter);
+        GSON.toJson(this, fileWriter);
         fileWriter.close();
     }
 
     public String getKindleAccountToken() {
-        return get(kindleAccountTokensKey);
+        return get(KINDLE_ACCOUNT_TOKENS_KEY);
     }
 
     public String getDSN() {
-        return get(dsnKey);
+        return get(DSN_KEY);
     }
 
     public String getMazamaRandomNumber() {
-        return get(mazamaRandomNumberKey);
+        return get(MAZAMA_RANDOM_NUMBER_KEY);
     }
 
     public String getSerialNumber() {
-        return get(serialNumberKey);
+        return get(SERIAL_NUMBER_KEY);
     }
 
     public String getIDString() {
-        return get(idStringKey);
+        return get(ID_STRING_KEY);
     }
 
     public String getUsernameHash() {
-        return get(usernameHashKey);
+        return get(USERNAME_HASH_KEY);
     }
 
     public String getUserName() {
-        return get(userNameKey);
+        return get(USER_NAME_KEY);
     }
 
+    @SuppressWarnings("unused")
     public String getKindleAccountTokenOrDefault(String defaultValue) {
-        return getOrDefault(kindleAccountTokensKey, defaultValue);
+        return getOrDefault(KINDLE_ACCOUNT_TOKENS_KEY, defaultValue);
     }
 
+    @SuppressWarnings("unused")
     public String getDSNOrDefault(String defaultValue) {
-        return getOrDefault(dsnKey, defaultValue);
+        return getOrDefault(DSN_KEY, defaultValue);
     }
 
+    @SuppressWarnings("unused")
     public String getMazamaRandomNumberOrDefault(String defaultValue) {
-        return getOrDefault(mazamaRandomNumberKey, defaultValue);
+        return getOrDefault(MAZAMA_RANDOM_NUMBER_KEY, defaultValue);
     }
 
+    @SuppressWarnings("unused")
     public String getSerialNumberOrDefault(String defaultValue) {
-        return getOrDefault(serialNumberKey, defaultValue);
+        return getOrDefault(SERIAL_NUMBER_KEY, defaultValue);
     }
 
+    @SuppressWarnings("unused")
     public String getIDStringOrDefault(String defaultValue) {
-        return getOrDefault(idStringKey, defaultValue);
+        return getOrDefault(ID_STRING_KEY, defaultValue);
     }
 
+    @SuppressWarnings("unused")
     public String getUsernameHashOrDefault(String defaultValue) {
-        return getOrDefault(usernameHashKey, defaultValue);
+        return getOrDefault(USERNAME_HASH_KEY, defaultValue);
     }
 
+    @SuppressWarnings("unused")
     public String getUserNameOrDefault(String defaultValue) {
-        return getOrDefault(userNameKey, defaultValue);
+        return getOrDefault(USER_NAME_KEY, defaultValue);
     }
 
     public boolean containsKindleAccountToken() {
-        return containsKey(kindleAccountTokensKey);
+        return containsKey(KINDLE_ACCOUNT_TOKENS_KEY);
     }
 
     public boolean containsDSN() {
-        return containsKey(dsnKey);
+        return containsKey(DSN_KEY);
     }
 
     public boolean containsMazamaRandomNumber() {
-        return containsKey(mazamaRandomNumberKey);
+        return containsKey(MAZAMA_RANDOM_NUMBER_KEY);
     }
 
     public boolean containsSerialNumber() {
-        return containsKey(serialNumberKey);
+        return containsKey(SERIAL_NUMBER_KEY);
     }
 
     public boolean containsIDString() {
-        return containsKey(idStringKey);
+        return containsKey(ID_STRING_KEY);
     }
 
     public boolean containsUsernameHash() {
-        return containsKey(usernameHashKey);
+        return containsKey(USERNAME_HASH_KEY);
     }
 
     public boolean containsUserName() {
-        return containsKey(userNameKey);
+        return containsKey(USER_NAME_KEY);
     }
 
     public byte[] getKindleAccountTokenBytes() {
@@ -237,6 +246,7 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
         return containsDSN() ? getDSNBytes() : defaultValue;
     }
 
+    @SuppressWarnings("unused")
     public byte[] getMazamaRandomNumberBytesOrDefault(byte[] defaultValue) {
         return containsMazamaRandomNumber() ? getMazamaRandomNumberBytes() : defaultValue;
     }
@@ -245,6 +255,7 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
         return containsSerialNumber() ? getSerialNumberBytes() : defaultValue;
     }
 
+    @SuppressWarnings("unused")
     public byte[] getIDStringBytesOrDefault(byte[] defaultValue) {
         return containsIDString() ? getIDStringBytes() : defaultValue;
     }
@@ -253,6 +264,7 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
         return containsUsernameHash() ? getUsernameHashBytes() : defaultValue;
     }
 
+    @SuppressWarnings("unused")
     public byte[] getUserNameBytesOrDefault(byte[] defaultValue) {
         return containsUserName() ? getUserNameBytes() : defaultValue;
     }

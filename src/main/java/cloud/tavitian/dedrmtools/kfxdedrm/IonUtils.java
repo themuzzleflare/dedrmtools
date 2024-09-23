@@ -29,6 +29,8 @@ final class IonUtils {
     public static final int TID_SEXP = 0xC;
     public static final int TID_STRUCT = 0xD;
     public static final int TID_TYPEDECL = 0xE;
+
+    @SuppressWarnings("unused")
     public static final int TID_UNUSED = 0xF;
 
     // Symbol IDs (SID)

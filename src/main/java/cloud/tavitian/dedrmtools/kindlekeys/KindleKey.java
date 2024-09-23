@@ -17,12 +17,12 @@ import static cloud.tavitian.dedrmtools.CryptoUtils.pbkdf2hmacsha1;
 import static cloud.tavitian.dedrmtools.Util.*;
 
 public abstract class KindleKey implements KindleKeyManager {
-    private static final String osName = System.getProperty("os.name").toLowerCase();
+    private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
     public static KindleKey getInstance() throws Exception {
-        if (osName.startsWith("win")) return new KindleKeyWindows();
-        else if (osName.startsWith("mac") || osName.startsWith("darwin")) return new KindleKeyMacOS();
-        else throw new Exception(String.format("Unsupported OS: %s", osName));
+        if (OS_NAME.startsWith("win")) return new KindleKeyWindows();
+        else if (OS_NAME.startsWith("mac") || OS_NAME.startsWith("darwin")) return new KindleKeyMacOS();
+        else throw new Exception(String.format("Unsupported OS: %s", OS_NAME));
     }
 
     // Method to decrypt the encrypted data using a derived key and IV

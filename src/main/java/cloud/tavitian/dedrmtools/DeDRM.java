@@ -27,7 +27,7 @@ import static cloud.tavitian.dedrmtools.Util.*;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindlePID.getPidSet;
 
 public final class DeDRM {
-    private static final String version = "2.0";
+    private static final String VERSION = "2.0";
 
     private DeDRM() {
     }
@@ -135,6 +135,7 @@ public final class DeDRM {
         return kDatabaseRecords;
     }
 
+    @SuppressWarnings("unused")
     private static void decryptionRoutine(String infile, String outdir, Set<KDatabaseRecord> kDatabaseRecords, Set<String> serials, Set<String> pids) throws Exception {
         decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, System.currentTimeMillis());
     }
@@ -166,11 +167,10 @@ public final class DeDRM {
 
         boolean mobi = true;
 
-        FileInputStream inputStream = new FileInputStream(infile);
-
-        byte[] magic8 = inputStream.readNBytes(8);
-
-        inputStream.close();
+        byte[] magic8;
+        try (FileInputStream inputStream = new FileInputStream(infile)) {
+            magic8 = inputStream.readNBytes(8);
+        }
 
         byte[] magic3 = Arrays.copyOfRange(magic8, 0, 3);
         byte[] magic4 = Arrays.copyOfRange(magic8, 0, 4);
@@ -234,14 +234,14 @@ public final class DeDRM {
 
         long startTime = System.currentTimeMillis();
 
-        System.out.printf("K4MobiDeDrm v%s.%n%s.%n", version, copyright);
+        System.out.printf("K4MobiDeDrm v%s.%n%s.%n", VERSION, COPYRIGHT);
         System.out.println("Removes DRM protection from Mobipocket, Amazon KF8, Amazon Print Replica, and Amazon Topaz eBooks.");
 
         Set<KDatabaseRecord> kDatabaseRecords = loadKDatabaseRecords(kDatabaseFiles);
 
         try {
             decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, startTime);
-        } catch (Exception ignored) {
+        } catch (Exception _) {
         }
     }
 
@@ -252,7 +252,7 @@ public final class DeDRM {
 
         long startTime = System.currentTimeMillis();
 
-        System.out.printf("K4MobiDeDrm v%s.%n%s.%n", version, copyright);
+        System.out.printf("K4MobiDeDrm v%s.%n%s.%n", VERSION, COPYRIGHT);
         System.out.println("Removes DRM protection from Mobipocket, Amazon KF8, Amazon Print Replica, and Amazon Topaz eBooks.");
 
         Set<KDatabaseRecord> kDatabaseRecords = loadKDatabaseRecords(kDatabaseFiles);
@@ -267,7 +267,7 @@ public final class DeDRM {
         serials = sanitiseSet(serials);
         pids = sanitiseSet(pids);
 
-        System.out.printf("K4MobiDeDrm v%s.%n%s.%n", version, copyright);
+        System.out.printf("K4MobiDeDrm v%s.%n%s.%n", VERSION, COPYRIGHT);
         System.out.println("Removes DRM protection from Mobipocket, Amazon KF8, Amazon Print Replica, and Amazon Topaz eBooks.");
 
         Set<KDatabaseRecord> kDatabaseRecords = loadKDatabaseRecords(kDatabaseFiles);
@@ -278,7 +278,7 @@ public final class DeDRM {
             try {
                 decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, startTime);
                 decryptionCounter++;
-            } catch (Exception ignored) {
+            } catch (Exception _) {
             } finally {
                 System.out.println();
             }
@@ -287,34 +287,42 @@ public final class DeDRM {
         System.out.printf("Decryption of %d/%d books completed after %.1f seconds%n", decryptionCounter, infiles.size(), (System.currentTimeMillis() - startTime) / 1000.0);
     }
 
+    @SuppressWarnings("unused")
     public static void decryptBook(String infile, String outdir, String kdatabases, String serials, String pids) {
         decryptBook(infile, outdir, commaSeparatedStringToSanitisedSet(kdatabases), commaSeparatedStringToSanitisedSet(serials), commaSeparatedStringToSanitisedSet(pids));
     }
 
+    @SuppressWarnings("unused")
     public static void decryptBookWithSerial(String infile, String outdir, Set<String> serials) {
         decryptBook(infile, outdir, Collections.emptySet(), serials, Collections.emptySet());
     }
 
+    @SuppressWarnings("unused")
     public static void decryptBookWithSerial(String infile, String outdir, String serials) {
         decryptBook(infile, outdir, Collections.emptySet(), commaSeparatedStringToSanitisedSet(serials), Collections.emptySet());
     }
 
+    @SuppressWarnings("unused")
     public static void decryptBookWithPid(String infile, String outdir, Set<String> pids) {
         decryptBook(infile, outdir, Collections.emptySet(), Collections.emptySet(), pids);
     }
 
+    @SuppressWarnings("unused")
     public static void decryptBookWithPid(String infile, String outdir, String pids) {
         decryptBook(infile, outdir, Collections.emptySet(), Collections.emptySet(), commaSeparatedStringToSanitisedSet(pids));
     }
 
+    @SuppressWarnings("unused")
     public static void decryptBookWithKDatabase(String infile, String outdir, Set<String> kdatabases) {
         decryptBook(infile, outdir, kdatabases, Collections.emptySet(), Collections.emptySet());
     }
 
+    @SuppressWarnings("unused")
     public static void decryptBookWithKDatabase(String infile, String outdir, String kdatabases) {
         decryptBook(infile, outdir, commaSeparatedStringToSanitisedSet(kdatabases), Collections.emptySet(), Collections.emptySet());
     }
 
+    @SuppressWarnings("unused")
     public static void decryptBookWithKDatabaseAndSerial(String infile, String outdir, Set<String> kdatabases, Set<String> serials) {
         decryptBook(infile, outdir, kdatabases, serials, Collections.emptySet());
     }
@@ -327,6 +335,7 @@ public final class DeDRM {
         decryptBookThrowing(infile, outdir, commaSeparatedStringToSanitisedSet(kdatabases), commaSeparatedStringToSanitisedSet(serials), Collections.emptySet());
     }
 
+    @SuppressWarnings("unused")
     public static void decryptBooksWithKDatabaseAndSerial(Set<String> infiles, String outdir, String kdatabases, String serials) {
         decryptBooks(infiles, outdir, commaSeparatedStringToSanitisedSet(kdatabases), commaSeparatedStringToSanitisedSet(serials), Collections.emptySet());
     }

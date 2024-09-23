@@ -23,7 +23,7 @@ import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.checksumPid;
 import static cloud.tavitian.dedrmtools.mobidedrm.PukallCipher.pc1;
 
 public final class MobiBook extends Book {
-    private static final String version = "3.0";
+    private static final String VERSION = "3.0";
 
     /**
      * The data file
@@ -60,6 +60,7 @@ public final class MobiBook extends Book {
     /**
      * The compression type
      */
+    @SuppressWarnings("FieldCanBeLocal")
     private final int compression;
     /**
      * The decrypted mobi data
@@ -68,6 +69,7 @@ public final class MobiBook extends Book {
     /**
      * The crypto type
      */
+    @SuppressWarnings("FieldCanBeLocal")
     private int cryptoType = -1;
     /**
      * The flag to print replica
@@ -86,19 +88,19 @@ public final class MobiBook extends Book {
      */
     private int mobiCodepage = 1252;
     /**
-     * The mobi version
+     * The mobi VERSION
      */
     private int mobiVersion = -1;
 
     public MobiBook(String infile) throws Exception {
         super();
-        System.out.printf("MobiDeDrm v%s.%n", version);
+        System.out.printf("MobiDeDrm v%s.%n", VERSION);
         System.out.println("Removes protection from Kindle/Mobipocket, Kindle/KF8 and Kindle/Print Replica eBooks.");
 
-        // initial sanity check on file
-        FileInputStream fis = new FileInputStream(infile);
-        dataFile = fis.readAllBytes();
-        fis.close();
+        try ( // initial sanity check on file
+              FileInputStream fis = new FileInputStream(infile)) {
+            dataFile = fis.readAllBytes();
+        }
 
         header = Arrays.copyOfRange(dataFile, 0, 78);
         magic = Arrays.copyOfRange(header, 0x3C, 0x3C + 8);
@@ -123,7 +125,9 @@ public final class MobiBook extends Book {
             int a3 = buffer.get() & 0xFF;
             int a4 = buffer.get() & 0xFF;
 
+            @SuppressWarnings("UnnecessaryLocalVariable")
             int flags = a1;
+
             int val = (a2 << 16) | (a3 << 8) | a4;
 
             BookSection bookSection = new BookSection(offset, flags, val);
@@ -268,8 +272,13 @@ public final class MobiBook extends Book {
 
                 // get some values from data, specifically verification, cksum, and cookie
                 long verification = buffer.getInt();
+
+                @SuppressWarnings("unused")
                 long size = buffer.getInt() & 0xFFFFFFFFL;
+
+                @SuppressWarnings("unused")
                 long type = buffer.getInt() & 0xFFFFFFFFL;
+
                 int cksum = buffer.get() & 0xFF;
                 byte[] cookie = new byte[32];
 
@@ -290,7 +299,10 @@ public final class MobiBook extends Book {
 
                     cookieBuffer.get(finalKey);
 
+                    @SuppressWarnings("unused")
                     long expiry = cookieBuffer.getInt() & 0xFFFFFFFFL;
+
+                    @SuppressWarnings("unused")
                     long expiry2 = cookieBuffer.getInt() & 0xFFFFFFFFL;
 
                     // Check if:
@@ -317,8 +329,13 @@ public final class MobiBook extends Book {
 
                 // get some values from data, specifically verification, cksum, and cookie
                 long verification = buffer.getInt() & 0xFFFFFFFFL;
+
+                @SuppressWarnings("unused")
                 long size = buffer.getInt() & 0xFFFFFFFFL;
+
+                @SuppressWarnings("unused")
                 long type = buffer.getInt() & 0xFFFFFFFFL;
+
                 int cksum = buffer.get() & 0xFF;
                 byte[] cookie = new byte[32];
 
@@ -333,12 +350,18 @@ public final class MobiBook extends Book {
 
                     // Extract some values from the decrypted cookie, specifically ver, flags, and the final key
                     long ver = cookieBuffer.getInt() & 0xFFFFFFFFL;
+
+                    @SuppressWarnings("unused")
                     int flags = cookieBuffer.getInt();
+
                     byte[] finalKey = new byte[16];
 
                     cookieBuffer.get(finalKey);
 
+                    @SuppressWarnings("unused")
                     long expiry = cookieBuffer.getInt() & 0xFFFFFFFFL;
+
+                    @SuppressWarnings("unused")
                     long expiry2 = cookieBuffer.getInt() & 0xFFFFFFFFL;
 
                     // check if the verification value extracted from data matches the ver value extracted from the decrypted cookie
@@ -357,15 +380,16 @@ public final class MobiBook extends Book {
         Set<String> goodPids = new LinkedHashSet<>();
 
         for (String pid : pidSet) {
-            if (pid.length() == 10) {
-                String substring = pid.substring(0, 8);
-
-                if (!checksumPid(substring, letters).equals(pid))
-                    System.out.printf("Warning: PID %s has an incorrect checksum, should have been %s%n", pid, checksumPid(substring, letters));
-
-                goodPids.add(substring);
-            } else if (pid.length() == 8) goodPids.add(pid);
-            else System.out.printf("Warning: PID %s has the wrong number of digits%n", pid);
+            switch (pid.length()) {
+                case 10 -> {
+                    String substring = pid.substring(0, 8);
+                    if (!checksumPid(substring, letters).equals(pid))
+                        System.out.printf("Warning: PID %s has an incorrect checksum, should have been %s%n", pid, checksumPid(substring, letters));
+                    goodPids.add(substring);
+                }
+                case 8 -> goodPids.add(pid);
+                default -> System.out.printf("Warning: PID %s has the wrong number of digits%n", pid);
+            }
         }
 
         return goodPids;
@@ -459,15 +483,16 @@ public final class MobiBook extends Book {
         patch(off + inOff, newContent);
     }
 
+    @SuppressWarnings("unused")
     private void patchSection(int section, byte[] newContent) {
         patchSection(section, newContent, 0);
     }
 
     @Override
     public void getFile(String outpath) throws IOException {
-        FileOutputStream fos = new FileOutputStream(outpath);
-        fos.write(mobiData);
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(outpath)) {
+            fos.write(mobiData);
+        }
     }
 
     @Override

@@ -31,7 +31,10 @@ final class BinaryIonParser {
     private int parentTid = 0;
     private int valueLen = 0;
     private boolean valueIsNull = false;
+
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private boolean valueIsTrue = false;
+
     private Object value;
     private boolean didImports = false;
     private List<ContainerRec> containerStack;
@@ -43,7 +46,7 @@ final class BinaryIonParser {
         reset();
     }
 
-    public void reset() {
+    public synchronized void reset() {
         state = ParserState.BEFORE_TID;
         needHasNext = true;
         localRemaining = -1;
@@ -53,7 +56,7 @@ final class BinaryIonParser {
         stream.seek(initPos);
     }
 
-    public boolean hasNext() throws Exception {
+    public synchronized boolean hasNext() throws Exception {
         while (needHasNext && !eof) {
             hasNextRaw();
 
@@ -75,7 +78,7 @@ final class BinaryIonParser {
         return !eof;
     }
 
-    private void hasNextRaw() throws Exception {
+    private synchronized void hasNextRaw() throws Exception {
         clearValue();
 
         while (valueTid == -1 && !eof) {
@@ -114,14 +117,14 @@ final class BinaryIonParser {
         }
     }
 
-    public int next() throws Exception {
+    public synchronized int next() throws Exception {
         if (hasNext()) {
             needHasNext = true;
             return valueTid;
         } else return -1;
     }
 
-    public void stepIn() throws Exception {
+    public synchronized void stepIn() throws Exception {
         if ((valueTid != TID_STRUCT && valueTid != TID_LIST && valueTid != TID_SEXP) || eof)
             throw new Exception(String.format("valuetid=%s eof=%s", valueTid, eof));
 
@@ -150,8 +153,8 @@ final class BinaryIonParser {
         needHasNext = true;
     }
 
-    public void stepOut() throws IOException {
-        ContainerRec rec = containerStack.remove(containerStack.size() - 1);
+    public synchronized void stepOut() throws IOException {
+        ContainerRec rec = containerStack.removeLast();
 
         eof = false;
         parentTid = rec.tid();
@@ -178,11 +181,11 @@ final class BinaryIonParser {
         localRemaining = rec.remaining();
     }
 
-    private void push(int typeId, int nextPosition, int nextRemaining) {
+    private synchronized void push(int typeId, int nextPosition, int nextRemaining) {
         containerStack.add(new ContainerRec(nextPosition, typeId, nextRemaining));
     }
 
-    private void clearValue() {
+    private synchronized void clearValue() {
         valueTid = -1;
         value = null;
         valueIsNull = false;
@@ -190,11 +193,11 @@ final class BinaryIonParser {
         annotations.clear();
     }
 
-    private byte[] read() throws IOException {
+    private synchronized byte[] read() throws IOException {
         return read(1);
     }
 
-    private byte[] read(int count) throws IOException {
+    private synchronized byte[] read(int count) throws IOException {
         if (localRemaining != -1) {
             localRemaining -= count;
 
@@ -208,7 +211,7 @@ final class BinaryIonParser {
         return result;
     }
 
-    private int readVarUInt() throws IOException {
+    private synchronized int readVarUInt() throws IOException {
         int b = ord(read());
         int result = b & 0x7F;
 
@@ -225,7 +228,7 @@ final class BinaryIonParser {
         return result;
     }
 
-    private int readVarInt() throws IOException {
+    private synchronized int readVarInt() throws IOException {
         int b = ord(read());
 
         boolean negative = (b & 0x40) != 0;
@@ -247,7 +250,7 @@ final class BinaryIonParser {
         return result;
     }
 
-    private double readDecimal() throws IOException {
+    private synchronized double readDecimal() throws IOException {
         System.out.println("Reading decimal");
 
         if (valueLen == 0) return 0;
@@ -265,8 +268,8 @@ final class BinaryIonParser {
 
         List<Integer> b = ordList(read(localRemaining));
 
-        if ((b.get(0) & 0x80) != 0) {
-            b.set(0, (b.get(0) & 0x7F));
+        if ((b.getFirst() & 0x80) != 0) {
+            b.set(0, (b.getFirst() & 0x7F));
             signed = true;
         }
 
@@ -289,17 +292,17 @@ final class BinaryIonParser {
         return result;
     }
 
-    private int readFieldId() {
+    private synchronized int readFieldId() {
         if (localRemaining != -1 && localRemaining < 1) return -1;
 
         try {
             return readVarUInt();
-        } catch (Exception ignored) {
+        } catch (IOException _) {
             return -1;
         }
     }
 
-    private int readTypeId() throws IOException {
+    private synchronized int readTypeId() throws IOException {
         if (localRemaining != -1) {
             if (localRemaining < 1) return -1;
             localRemaining -= 1;
@@ -336,21 +339,22 @@ final class BinaryIonParser {
         return result;
     }
 
-    private void skip(int count) throws IOException {
+    private synchronized void skip(int count) throws IOException {
         if (localRemaining != -1) {
             localRemaining -= count;
 
             if (localRemaining < 0) throw new EOFException("EOF encountered");
         }
 
+        //noinspection ResultOfMethodCallIgnored
         stream.skip(count);
     }
 
-    public void addToCatalog(String name, int version, List<String> symbols) {
+    public synchronized void addToCatalog(String name, int version, List<String> symbols) {
         catalog.add(new IonCatalogItem(name, version, symbols));
     }
 
-    private void parseSymbolTable() throws Exception {
+    private synchronized void parseSymbolTable() throws Exception {
         // Advance to the next value (shouldn't do anything meaningful)
         next();
 
@@ -377,7 +381,7 @@ final class BinaryIonParser {
         didImports = true;
     }
 
-    private void gatherImports() throws Exception {
+    private synchronized void gatherImports() throws Exception {
         stepIn();
 
         int t = next();
@@ -390,7 +394,7 @@ final class BinaryIonParser {
         stepOut();
     }
 
-    private void checkVersionMarker() throws IOException {
+    private synchronized void checkVersionMarker() throws IOException {
         for (byte[] marker : VERSION_MARKER) {
             if (!Arrays.equals(read(), marker)) throw new IllegalStateException("Unknown version marker");
         }
@@ -403,7 +407,7 @@ final class BinaryIonParser {
         state = ParserState.AFTER_VALUE;
     }
 
-    private void loadAnnotations() throws IOException {
+    private synchronized void loadAnnotations() throws IOException {
         int ln = readVarUInt();
         long maxPos = stream.tell() + ln;
 
@@ -412,7 +416,7 @@ final class BinaryIonParser {
         valueTid = readTypeId();
     }
 
-    private void readImport() throws Exception {
+    private synchronized void readImport() throws Exception {
         int version = -1;
         int maxId = -1;
         String name = "";
@@ -423,9 +427,13 @@ final class BinaryIonParser {
 
         while (t != -1) {
             if (!valueIsNull && valueFieldId != SID_UNKNOWN) {
-                if (valueFieldId == SID_NAME) name = stringValue();
-                else if (valueFieldId == SID_VERSION) version = intValue();
-                else if (valueFieldId == SID_MAX_ID) maxId = intValue();
+                switch (valueFieldId) {
+                    case SID_NAME -> name = stringValue();
+                    case SID_VERSION -> version = intValue();
+                    case SID_MAX_ID -> maxId = intValue();
+                    default -> {
+                    }
+                }
             }
 
             t = next();
@@ -454,16 +462,16 @@ final class BinaryIonParser {
         } else symbols.importUnknown(name, maxId);
     }
 
-    private IonCatalogItem findCatalogItem(String name) {
+    private synchronized IonCatalogItem findCatalogItem(String name) {
         for (IonCatalogItem item : catalog) if (item.name().equals(name)) return item;
         return null; // Return null if no matching item is found
     }
 
-    private void prepareValue() throws IOException {
+    private synchronized void prepareValue() throws IOException {
         if (value == null) loadScalarValue();
     }
 
-    private int intValue() throws IOException {
+    private synchronized int intValue() throws IOException {
         if (valueTid != TID_POSINT && valueTid != TID_NEGINT) throw new IllegalStateException("Not an int");
 
         prepareValue();
@@ -474,7 +482,7 @@ final class BinaryIonParser {
             throw new IllegalStateException(String.format("Expected an integer value but found: %s", value.getClass().getSimpleName()));
     }
 
-    public String stringValue() throws IOException {
+    public synchronized String stringValue() throws IOException {
         if (valueTid != TID_STRING) throw new IllegalStateException("Not a string");
 
         if (valueIsNull) return "";
@@ -486,7 +494,7 @@ final class BinaryIonParser {
             throw new IllegalStateException(String.format("Expected a string value but found: %s", value.getClass().getSimpleName()));
     }
 
-    private String symbolValue() throws IOException {
+    private synchronized String symbolValue() throws IOException {
         if (valueTid != TID_SYMBOL) throw new IllegalStateException("Not a symbol");
 
         prepareValue();
@@ -501,7 +509,7 @@ final class BinaryIonParser {
             throw new IllegalStateException(String.format("Expected an integer value for symbol ID but found: %s", value.getClass().getSimpleName()));
     }
 
-    public byte[] lobValue() throws IOException {
+    public synchronized byte[] lobValue() throws IOException {
         if (valueTid != TID_CLOB && valueTid != TID_BLOB)
             throw new IllegalStateException(String.format("Not a LOB type: %s", getFieldName()));
 
@@ -514,7 +522,7 @@ final class BinaryIonParser {
         return result;
     }
 
-    private double decimalValue() throws IOException {
+    private synchronized double decimalValue() throws IOException {
         if (valueTid != TID_DECIMAL) throw new IllegalStateException("Not a decimal");
 
         prepareValue();
@@ -524,27 +532,29 @@ final class BinaryIonParser {
             throw new IllegalStateException(String.format("Expected a decimal value but found: %s", value.getClass().getSimpleName()));
     }
 
-    public String getFieldName() {
+    public synchronized String getFieldName() {
         if (valueFieldId == SID_UNKNOWN) return "";
 
         return symbols.findById(valueFieldId);
     }
 
-    private SymbolToken getFieldNameSymbol() {
+    @SuppressWarnings("unused")
+    private synchronized SymbolToken getFieldNameSymbol() {
         return new SymbolToken(getFieldName(), valueFieldId);
     }
 
-    public String getTypeName() {
+    public synchronized String getTypeName() {
         if (annotations.isEmpty()) return "";
-        return symbols.findById(annotations.get(0));
+        return symbols.findById(annotations.getFirst());
     }
 
-    private void forceImport(List<String> symbols) {
+    @SuppressWarnings("unused")
+    private synchronized void forceImport(List<String> symbols) {
         IonCatalogItem item = new IonCatalogItem("Forced", 1, symbols);
         this.symbols.importSymbols(item, symbols.size());
     }
 
-    private void loadScalarValue() throws IOException {
+    private synchronized void loadScalarValue() throws IOException {
         if (valueTid != TID_NULL && valueTid != TID_BOOLEAN && valueTid != TID_POSINT &&
                 valueTid != TID_NEGINT && valueTid != TID_FLOAT && valueTid != TID_DECIMAL &&
                 valueTid != TID_TIMESTAMP && valueTid != TID_SYMBOL && valueTid != TID_STRING) return;
@@ -554,27 +564,33 @@ final class BinaryIonParser {
             return;
         }
 
-        if (valueTid == TID_STRING) {
-            byte[] stringBytes = read(valueLen);
-            value = new String(stringBytes, StandardCharsets.UTF_8);
-        } else if (valueTid == TID_POSINT || valueTid == TID_NEGINT || valueTid == TID_SYMBOL) {
-            if (valueLen == 0) value = 0;
-            else {
-                if (valueLen > 4) throw new IllegalStateException(String.format("int too long: %d", valueLen));
-
-                int v = 0;
-
-                for (int i = valueLen - 1; i >= 0; i--) v |= ord(read()) << (i * 8);
-
-                if (valueTid == TID_NEGINT) value = -v;
-                else value = v;
+        switch (valueTid) {
+            case TID_STRING -> {
+                byte[] stringBytes = read(valueLen);
+                value = new String(stringBytes, StandardCharsets.UTF_8);
             }
-        } else if (valueTid == TID_DECIMAL) value = readDecimal();
+            case TID_POSINT, TID_NEGINT, TID_SYMBOL -> {
+                if (valueLen == 0) value = 0;
+                else {
+                    if (valueLen > 4) throw new IllegalStateException(String.format("int too long: %d", valueLen));
+
+                    int v = 0;
+
+                    for (int i = valueLen - 1; i >= 0; i--) v |= ord(read()) << (i * 8);
+
+                    if (valueTid == TID_NEGINT) value = -v;
+                    else value = v;
+                }
+            }
+            case TID_DECIMAL -> value = readDecimal();
+            default -> {
+            }
+        }
 
         state = ParserState.AFTER_VALUE;
     }
 
-    private void ionWalk(int supert, String indent, List<String> lst) throws Exception {
+    private synchronized void ionWalk(int supert, String indent, List<String> lst) throws Exception {
         while (hasNext()) {
             String l;
             if (supert == TID_STRUCT) l = String.format("%s:", getFieldName());
@@ -600,27 +616,18 @@ final class BinaryIonParser {
                 else lst.add(indent + "]");
             } else {
                 switch (t) {
-                    case TID_STRING:
-                        l += String.format("\"%s\"", stringValue());
-                        break;
-                    case TID_CLOB, TID_BLOB:
-                        l += String.format("{%s}", printLob(lobValue()));
-                        break;
-                    case TID_POSINT:
-                        l += String.valueOf(intValue());
-                        break;
-                    case TID_SYMBOL:
+                    case TID_STRING -> l += String.format("\"%s\"", stringValue());
+                    case TID_CLOB, TID_BLOB -> l += String.format("{%s}", printLob(lobValue()));
+                    case TID_POSINT -> l += String.valueOf(intValue());
+                    case TID_SYMBOL -> {
                         String tn = getTypeName();
                         if (!tn.isEmpty()) {
                             tn += "::";
                         }
                         l += tn + symbolValue();
-                        break;
-                    case TID_DECIMAL:
-                        l += String.valueOf(decimalValue());
-                        break;
-                    default:
-                        l += String.format("TID %d", t);
+                    }
+                    case TID_DECIMAL -> l += String.valueOf(decimalValue());
+                    default -> l += String.format("TID %d", t);
                 }
 
                 lst.add(indent + l);
@@ -628,12 +635,12 @@ final class BinaryIonParser {
         }
     }
 
-    private String printLob(byte[] b) {
+    private synchronized String printLob(byte[] b) {
         if (b == null) return "null";
 
         StringBuilder result = new StringBuilder();
 
-        for (byte value : b) result.append(String.format("%02x ", value));
+        for (byte byteVal : b) result.append(String.format("%02x ", byteVal));
 
         // Remove the trailing space if result is not empty
         if (!result.isEmpty()) result.setLength(result.length() - 1);
@@ -641,7 +648,8 @@ final class BinaryIonParser {
         return result.toString();
     }
 
-    private void print(List<String> lst) throws Exception {
+    @SuppressWarnings("unused")
+    private synchronized void print(List<String> lst) throws Exception {
         reset();
         ionWalk(-1, "", lst);
     }

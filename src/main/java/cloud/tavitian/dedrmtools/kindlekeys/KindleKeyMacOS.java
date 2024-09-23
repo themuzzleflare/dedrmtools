@@ -340,7 +340,7 @@ final class KindleKeyMacOS extends KindleKey {
                 items = new ArrayList<>(Arrays.asList(new String(data).split("/")));
 
                 // Extract headerblob
-                String headerblob = items.remove(0);
+                String headerblob = items.removeFirst();
                 byte[] encryptedValue = decode(headerblob.getBytes(), charMap1);
                 byte[] cleartext = unprotectHeaderData(encryptedValue);
 
@@ -385,7 +385,7 @@ final class KindleKeyMacOS extends KindleKey {
 
                 // Process each item
                 while (!items.isEmpty()) {
-                    String item = items.remove(0);
+                    String item = items.removeFirst();
 
                     byte[] keyHash = item.substring(0, 32).getBytes(StandardCharsets.UTF_8);
                     byte[] srcnt = decode(item.substring(34).getBytes(), charMap5);
@@ -399,7 +399,7 @@ final class KindleKeyMacOS extends KindleKey {
                     ByteArrayOutputStream edlst = new ByteArrayOutputStream();
 
                     for (int i = 0; i < rcnt; i++) {
-                        String record = items.remove(0);
+                        String record = items.removeFirst();
                         edlst.write(record.getBytes(StandardCharsets.UTF_8));
                     }
 
@@ -420,7 +420,7 @@ final class KindleKeyMacOS extends KindleKey {
                     Debug.printf("encdata: %s%n", formatByteArray(encdata));
 
                     List<Integer> primesList = primes(encdata.length / 3);
-                    int noffset = encdata.length - primesList.get(primesList.size() - 1);
+                    int noffset = encdata.length - primesList.getLast();
                     byte[] pfx = Arrays.copyOfRange(encdata, 0, noffset);
                     byte[] suffix = Arrays.copyOfRange(encdata, noffset, encdata.length);
 
@@ -483,8 +483,12 @@ final class KindleKeyMacOS extends KindleKey {
     }
 
     private class CryptUnprotectData {
+        @SuppressWarnings("FieldCanBeLocal")
         private final byte[] key;
+
+        @SuppressWarnings("FieldCanBeLocal")
         private final byte[] iv;
+
         private final Cipher crp;
 
         public CryptUnprotectData(byte[] entropy, byte[] idString) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
@@ -495,7 +499,9 @@ final class KindleKeyMacOS extends KindleKey {
             byte[] passwdData = encode(sha256(sp), charMap2);
 
             // Use PBKDF2 with SHA-1 to derive the key and IV
+            @SuppressWarnings("UnnecessaryLocalVariable")
             byte[] salt = entropy;
+
             byte[] keyIv = pbkdf2hmacsha1(passwdData, salt, 0x800, 0x400);
 
             // Split the derived data into key and IV

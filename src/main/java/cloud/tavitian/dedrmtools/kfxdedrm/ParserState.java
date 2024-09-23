@@ -18,6 +18,7 @@ enum ParserState {
         this.value = value;
     }
 
+    @SuppressWarnings("unused")
     public int getValue() {
         return value;
     }
