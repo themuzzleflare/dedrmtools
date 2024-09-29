@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.net.URI;
 
@@ -27,7 +29,7 @@ public final class BookFile extends File {
         super(uri);
     }
 
-    public String getRoot() {
+    public @NotNull String getRoot() {
         String fileName = getName();
 
         // Find the last dot in the file name

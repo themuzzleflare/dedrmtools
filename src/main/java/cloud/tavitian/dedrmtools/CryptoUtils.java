@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
@@ -100,7 +102,7 @@ public final class CryptoUtils {
      * @throws NoSuchAlgorithmException if the <code>PBKDF2WithHmacSHA1</code> algorithm is not available
      * @throws InvalidKeySpecException  if the key specification is invalid
      */
-    public static byte[] pbkdf2hmacsha1(String password, byte[] salt, int iterationCount, int keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static byte[] pbkdf2hmacsha1(@NotNull String password, byte[] salt, int iterationCount, int keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
         char[] passwdchararr = password.toCharArray();
         return pbkdf2hmacsha1(passwdchararr, salt, iterationCount, keyLength);
     }

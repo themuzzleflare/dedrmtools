@@ -4,6 +4,9 @@
 
 package cloud.tavitian.dedrmtools;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 public final class Util {
@@ -16,7 +19,7 @@ public final class Util {
      * @param data The byte array to format as a string.
      * @return A string representation of the byte array, resembling a Python byte string.
      */
-    public static String formatByteArray(byte[] data) {
+    public static @NotNull String formatByteArray(byte[] data) {
         if (data == null) return "b''"; // Return an empty byte string if the array is null
 
         StringBuilder sb = new StringBuilder("b'");
@@ -38,7 +41,7 @@ public final class Util {
      * @param padByte The byte to use for padding.
      * @return A new byte array of the specified width, with <code>data</code> left-justified and padded with <code>padByte</code>.
      */
-    public static byte[] ljustBytes(byte[] data, int width, byte padByte) {
+    public static byte @NotNull [] ljustBytes(byte[] data, int width, byte padByte) {
         if (data == null) {
             data = new byte[width]; // Create a new array of 'width' size if the original array is null
             Arrays.fill(data, padByte); // Fill the array with 'padByte'
@@ -99,7 +102,7 @@ public final class Util {
     }
 
     // Helper function to concatenate byte arrays
-    public static byte[] concatenateArrays(byte[]... data) {
+    public static byte @NotNull [] concatenateArrays(byte[]... data) {
         int totalLength = 0;
 
         for (byte[] array : data) totalLength += array.length;
@@ -115,7 +118,8 @@ public final class Util {
         return result;
     }
 
-    public static int[] toIntegerArray(List<Integer> list) {
+    @Contract("null -> new")
+    public static int @NotNull [] toIntegerArray(List<Integer> list) {
         if (list == null) return new int[0];
 
         int[] data = new int[list.size()];
@@ -125,7 +129,7 @@ public final class Util {
         return data;
     }
 
-    public static List<Integer> toIntegerList(int[] data) {
+    public static @NotNull List<Integer> toIntegerList(int[] data) {
         if (data == null) return Collections.emptyList();
 
         List<Integer> list = new ArrayList<>();
@@ -135,17 +139,19 @@ public final class Util {
         return list;
     }
 
-    public static List<Integer> toIntegerList(byte[] data) {
+    public static @NotNull List<Integer> toIntegerList(byte[] data) {
         return ordList(data);
     }
 
-    public static byte[] toByteArray(List<Integer> list) {
+    @Contract("null -> new")
+    public static byte @NotNull [] toByteArray(List<Integer> list) {
         if (list == null) return new byte[0];
 
         return toByteArray(list, list.size());
     }
 
-    public static byte[] toByteArray(List<Integer> list, int length) {
+    @Contract("null, _ -> new")
+    public static byte @NotNull [] toByteArray(List<Integer> list, int length) {
         if (list == null) return new byte[0];
 
         byte[] array = new byte[length];
@@ -155,13 +161,15 @@ public final class Util {
         return array;
     }
 
-    public static byte[] toByteArray(int[] data) {
+    @Contract(value = "null -> new", pure = true)
+    public static byte @NotNull [] toByteArray(int[] data) {
         if (data == null) return new byte[0];
 
         return toByteArray(data, data.length);
     }
 
-    public static byte[] toByteArray(int[] data, int length) {
+    @Contract(value = "null, _ -> new", pure = true)
+    public static byte @NotNull [] toByteArray(int[] data, int length) {
         if (data == null) return new byte[0];
 
         byte[] result = new byte[length];
@@ -171,8 +179,9 @@ public final class Util {
         return result;
     }
 
+    @Contract("null -> new")
     @SuppressWarnings("unused")
-    public static byte[] byteListToByteArray(List<Byte> list) {
+    public static byte @NotNull [] byteListToByteArray(List<Byte> list) {
         if (list == null) return new byte[0];
 
         byte[] data = new byte[list.size()];
@@ -183,7 +192,7 @@ public final class Util {
     }
 
     @SuppressWarnings("unused")
-    public static List<Byte> toByteList(byte[] data) {
+    public static @NotNull List<Byte> toByteList(byte[] data) {
         if (data == null) return Collections.emptyList();
 
         List<Byte> list = new ArrayList<>();
@@ -193,7 +202,8 @@ public final class Util {
         return list;
     }
 
-    public static int ord(byte[] data) {
+    @Contract(pure = true)
+    public static int ord(byte @NotNull [] data) {
         return ord(data[0]);
     }
 
@@ -201,7 +211,7 @@ public final class Util {
         return data & 0xFF;
     }
 
-    public static List<Integer> ordList(byte[] data) {
+    public static @NotNull List<Integer> ordList(byte[] data) {
         if (data == null) return Collections.emptyList();
 
         List<Integer> list = new ArrayList<>();
@@ -268,7 +278,8 @@ public final class Util {
         return -1; // Returns -1 if the byte is not found in the array
     }
 
-    public static String[] toStringArray(List<String> list) {
+    @Contract("null -> new")
+    public static String @NotNull [] toStringArray(List<String> list) {
         if (list == null) return new String[0]; // Return an empty array if the list is null
 
         return list.toArray(new String[0]); // Convert the list to an array

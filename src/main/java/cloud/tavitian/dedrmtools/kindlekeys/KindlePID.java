@@ -4,6 +4,9 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -23,7 +26,7 @@ public final class KindlePID {
     }
 
     // Generate the encryption table used to generate the device PID
-    private static int[] generatePidEncryptionTable() {
+    private static int @NotNull [] generatePidEncryptionTable() {
         List<Integer> table = new ArrayList<>();
 
         for (int counter1 = 0; counter1 < 0x100; counter1++) {
@@ -56,7 +59,7 @@ public final class KindlePID {
     }
 
     // Generate the device PID
-    private static byte[] generateDevicePid(int[] table, byte[] dsn, @SuppressWarnings("SameParameterValue") int nbRoll) {
+    private static byte @NotNull [] generateDevicePid(int[] table, byte[] dsn, @SuppressWarnings("SameParameterValue") int nbRoll) {
         // Generate the seed
         int seed = generatePidSeed(table, dsn);
 
@@ -86,7 +89,8 @@ public final class KindlePID {
     }
 
     // Returns two bit at offset from a bit field
-    private static int getTwoBitsFromBitField(byte[] bitField, int offset) {
+    @Contract(pure = true)
+    private static int getTwoBitsFromBitField(byte @NotNull [] bitField, int offset) {
         int byteNumber = offset / 4;
         int bitPosition = 6 - 2 * (offset % 4);
 
@@ -103,7 +107,7 @@ public final class KindlePID {
     }
 
     // 8 bits to six bits encoding from hash to generate PID string
-    private static byte[] encodePid(byte[] hashVal) {
+    private static byte @NotNull [] encodePid(byte[] hashVal) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         for (int i = 0; i < 8; i++) {
@@ -114,7 +118,7 @@ public final class KindlePID {
         return outputStream.toByteArray();
     }
 
-    private static byte[] pidFromSerial(byte[] serial, @SuppressWarnings("SameParameterValue") int length) {
+    private static byte @NotNull [] pidFromSerial(byte[] serial, @SuppressWarnings("SameParameterValue") int length) {
         int crc = (int) crc32(serial);
 
         // Initialise arr1 with length l and fill with zeros
@@ -150,11 +154,11 @@ public final class KindlePID {
         return outputStream.toByteArray();
     }
 
-    private static Set<String> getKindlePids(byte[] rec209, byte[] token, String serialnum) throws Exception {
+    private static @NotNull Set<String> getKindlePids(byte[] rec209, byte[] token, @NotNull String serialnum) throws Exception {
         return getKindlePids(rec209, token, serialnum.getBytes());
     }
 
-    private static Set<String> getKindlePids(byte[] rec209, byte[] token, byte[] serialnum) throws Exception {
+    private static @NotNull Set<String> getKindlePids(byte[] rec209, byte[] token, byte[] serialnum) throws Exception {
         Set<String> pids = new LinkedHashSet<>();
 
         if (rec209 == null) return Set.of(new String(serialnum));
@@ -176,7 +180,7 @@ public final class KindlePID {
     }
 
     // parse the Kindleinfo file to calculate the book pid.
-    private static Set<String> getK4Pids(byte[] rec209, byte[] token, KDatabaseRecord kDatabaseRecord) throws Exception {
+    private static Set<String> getK4Pids(byte[] rec209, byte[] token, @NotNull KDatabaseRecord kDatabaseRecord) throws Exception {
         Set<String> pids = new LinkedHashSet<>();
 
         byte[] kindleAccountToken = kDatabaseRecord.kindleDatabase().genKindleAccountToken();
@@ -223,7 +227,7 @@ public final class KindlePID {
         return pids;
     }
 
-    public static Set<String> getPidSet(byte[] rec209, byte[] token, Set<String> serials, Set<KDatabaseRecord> kDatabaseRecords) {
+    public static @NotNull Set<String> getPidSet(byte[] rec209, byte[] token, Set<String> serials, @NotNull Set<KDatabaseRecord> kDatabaseRecords) {
         Set<String> pids = new LinkedHashSet<>();
 
         for (KDatabaseRecord kDatabaseRecord : kDatabaseRecords) {

@@ -4,10 +4,15 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+
 import java.util.Set;
 
 record KindlePath(KindleDatabaseType type, String path) {
-    public static Set<KindlePath> getKindlePathsMac(String homeDir) {
+    @Contract("_ -> new")
+    public static @NotNull @Unmodifiable Set<KindlePath> getKindlePathsMac(String homeDir) {
         return Set.of(
                 // .kinf2018 file in new location (App Store Kindle for Mac)
                 new KindlePath(KindleDatabaseType.K4MACKINF2018, homeDir + "/Library/Containers/com.amazon.Kindle/Data/Library/Application Support/Kindle/storage/.kinf2018"),
@@ -28,7 +33,8 @@ record KindlePath(KindleDatabaseType type, String path) {
         );
     }
 
-    public static Set<KindlePath> getKindlePathsWindows(String homeDir) {
+    @Contract("_ -> new")
+    public static @NotNull @Unmodifiable Set<KindlePath> getKindlePathsWindows(String homeDir) {
         return Set.of(
                 // (K4PC 1.25.1 and later) .kinf2018 file
                 new KindlePath(KindleDatabaseType.K4PC125KINF2018, homeDir + "\\Amazon\\Kindle\\storage\\.kinf2018"),
@@ -43,8 +49,9 @@ record KindlePath(KindleDatabaseType type, String path) {
         );
     }
 
+    @Contract(pure = true)
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return String.format("%s file: %s", type, path);
     }
 }

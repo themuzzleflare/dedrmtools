@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +27,7 @@ final class Workspace {
         shuffle(toIntegerList(shufList));
     }
 
-    public void shuffle(List<Integer> shufList) {
+    public void shuffle(@NotNull List<Integer> shufList) {
         List<Integer> rt = new ArrayList<>();
 
         for (Integer integer : shufList) rt.add(work.get(integer));
@@ -153,7 +155,7 @@ final class Workspace {
         }
     }
 
-    public List<Integer> mask(byte[] chunk) {
+    public @NotNull List<Integer> mask(byte @NotNull [] chunk) {
         List<Integer> out = new ArrayList<>();
 
         for (int a = 0; a < chunk.length; a++) {

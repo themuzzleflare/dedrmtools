@@ -4,6 +4,9 @@
 
 package cloud.tavitian.dedrmtools.mobidedrm;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 final class PukallCipher {
     private static final int KEY_LENGTH = 16;
     private static final int KEY_COMPONENTS = 8;
@@ -16,11 +19,11 @@ final class PukallCipher {
     private PukallCipher() {
     }
 
-    public static byte[] pc1(byte[] key, byte[] src) throws Exception {
+    public static byte @NotNull [] pc1(byte[] key, byte[] src) throws Exception {
         return pc1(key, src, true);
     }
 
-    public static byte[] pc1(byte[] key, byte[] src, boolean decryption) throws Exception {
+    public static byte @NotNull [] pc1(byte[] key, byte @NotNull [] src, boolean decryption) throws Exception {
         validateKeyLength(key);
 
         int[] wkey = initialiseWKey(key);
@@ -31,11 +34,12 @@ final class PukallCipher {
         return dst;
     }
 
-    private static void validateKeyLength(byte[] key) throws Exception {
+    private static void validateKeyLength(byte @NotNull [] key) throws Exception {
         if (key.length != KEY_LENGTH) throw new Exception("PC1: Bad key length");
     }
 
-    private static int[] initialiseWKey(byte[] key) {
+    @Contract(pure = true)
+    private static int @NotNull [] initialiseWKey(byte[] key) {
         int[] wkey = new int[KEY_COMPONENTS];
 
         for (int i = 0; i < KEY_COMPONENTS; i++)
@@ -44,7 +48,7 @@ final class PukallCipher {
         return wkey;
     }
 
-    private static void processSourceArray(byte[] src, boolean decryption, int[] wkey, byte[] dst) {
+    private static void processSourceArray(byte @NotNull [] src, boolean decryption, int[] wkey, byte[] dst) {
         int sum1 = 0, sum2 = 0, keyXorVal = 0;
 
         for (int i = 0; i < src.length; i++) {

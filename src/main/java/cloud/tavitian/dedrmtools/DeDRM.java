@@ -11,6 +11,7 @@ import cloud.tavitian.dedrmtools.kindlekeys.KindleKey;
 import cloud.tavitian.dedrmtools.mobidedrm.MobiBook;
 import cloud.tavitian.dedrmtools.topazextract.TopazBook;
 import org.apache.commons.text.StringEscapeUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public final class DeDRM {
     private DeDRM() {
     }
 
-    private static String cleanupName(String name) {
+    private static @NotNull String cleanupName(String name) {
         // Substitute filename unfriendly characters
         name = name.replace("<", "[")
                 .replace(">", "]")
@@ -73,7 +74,7 @@ public final class DeDRM {
         return name;
     }
 
-    private static String unescape(String text) {
+    private static @NotNull String unescape(String text) {
         Pattern pattern = Pattern.compile("&#?\\w+;");
         Matcher matcher = pattern.matcher(text);
         StringBuilder result = new StringBuilder();
@@ -96,7 +97,7 @@ public final class DeDRM {
         return result.toString();
     }
 
-    private static String calculateOutfileName(String filename, String booktitle) {
+    private static @NotNull String calculateOutfileName(String filename, String booktitle) {
         String origFnRoot = new BookFile(filename).getRoot();
 
         String outfilename;
@@ -117,7 +118,7 @@ public final class DeDRM {
         return outfilename;
     }
 
-    private static Set<KDatabaseRecord> loadKDatabaseRecords(Set<String> kDatabaseFiles) {
+    private static @NotNull Set<KDatabaseRecord> loadKDatabaseRecords(Set<String> kDatabaseFiles) {
         Set<KDatabaseRecord> kDatabaseRecords = new LinkedHashSet<>();
 
         if (practicalIsEmpty(kDatabaseFiles)) return kDatabaseRecords;
@@ -158,11 +159,11 @@ public final class DeDRM {
         }
     }
 
-    private static Book getDecryptedBook(String infile, Set<KDatabaseRecord> kDatabaseRecords, Set<String> serials, Set<String> pids) throws Exception {
+    private static @NotNull Book getDecryptedBook(String infile, Set<KDatabaseRecord> kDatabaseRecords, Set<String> serials, Set<String> pids) throws Exception {
         return getDecryptedBook(infile, kDatabaseRecords, serials, pids, System.currentTimeMillis());
     }
 
-    private static Book getDecryptedBook(String infile, Set<KDatabaseRecord> kDatabaseRecords, Set<String> serials, Set<String> pids, long startTime) throws Exception {
+    private static @NotNull Book getDecryptedBook(String infile, Set<KDatabaseRecord> kDatabaseRecords, Set<String> serials, Set<String> pids, long startTime) throws Exception {
         Book book;
 
         boolean mobi = true;
@@ -260,7 +261,7 @@ public final class DeDRM {
         decryptionRoutine(infile, outdir, kDatabaseRecords, serials, pids, startTime);
     }
 
-    public static void decryptBooks(Set<String> infiles, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {
+    public static void decryptBooks(@NotNull Set<String> infiles, String outdir, Set<String> kDatabaseFiles, Set<String> serials, Set<String> pids) {
         long startTime = System.currentTimeMillis();
 
         kDatabaseFiles = sanitiseSet(kDatabaseFiles);

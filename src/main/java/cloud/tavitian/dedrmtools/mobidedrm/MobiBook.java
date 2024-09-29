@@ -7,6 +7,8 @@ package cloud.tavitian.dedrmtools.mobidedrm;
 import cloud.tavitian.dedrmtools.Book;
 import cloud.tavitian.dedrmtools.Debug;
 import cloud.tavitian.dedrmtools.PIDMetaInfo;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -248,7 +250,8 @@ public final class MobiBook extends Book {
         }
     }
 
-    private static DRMInfo parseDrm(byte[] data, int count, Set<String> pidSet) throws Exception {
+    @Contract("_, _, _ -> new")
+    private static @NotNull DRMInfo parseDrm(byte[] data, int count, @NotNull Set<String> pidSet) throws Exception {
         byte[] foundKey = null;
         String foundPid = null;
 
@@ -376,7 +379,7 @@ public final class MobiBook extends Book {
         return new DRMInfo(foundKey, foundPid);
     }
 
-    private static Set<String> normalisePids(Set<String> pidSet) throws IOException {
+    private static @NotNull Set<String> normalisePids(@NotNull Set<String> pidSet) throws IOException {
         Set<String> goodPids = new LinkedHashSet<>();
 
         for (String pid : pidSet) {
@@ -399,7 +402,7 @@ public final class MobiBook extends Book {
      * @param section The section index to load
      * @return The byte array of the section
      */
-    private byte[] loadSection(int section) {
+    private byte @NotNull [] loadSection(int section) {
         int endoff = section + 1 == numSections ? dataFile.length : sections.get(section + 1).offset();
 
         int off = sections.get(section).offset();
@@ -407,8 +410,9 @@ public final class MobiBook extends Book {
         return Arrays.copyOfRange(dataFile, off, endoff);
     }
 
+    @Contract(" -> new")
     @Override
-    public String getBookTitle() {
+    public @NotNull String getBookTitle() {
         Map<Integer, String> codecMap = new LinkedHashMap<>();
 
         codecMap.put(1252, "windows-1252");
@@ -442,8 +446,9 @@ public final class MobiBook extends Book {
         return new String(title, Charset.forName(codec));
     }
 
+    @Contract(" -> new")
     @Override
-    public PIDMetaInfo getPidMetaInfo() {
+    public @NotNull PIDMetaInfo getPidMetaInfo() {
         byte[] rec209 = new byte[0];
 
         ByteArrayOutputStream tokenStream = new ByteArrayOutputStream();
@@ -474,7 +479,7 @@ public final class MobiBook extends Book {
         System.arraycopy(newContent, 0, dataFile, off, newContent.length);
     }
 
-    private void patchSection(int section, byte[] newContent, int inOff) {
+    private void patchSection(int section, byte @NotNull [] newContent, int inOff) {
         int endoff = section + 1 == numSections ? dataFile.length : sections.get(section + 1).offset();
         int off = sections.get(section).offset();
 
@@ -495,8 +500,9 @@ public final class MobiBook extends Book {
         }
     }
 
+    @Contract(pure = true)
     @Override
-    public String getBookType() {
+    public @NotNull String getBookType() {
         if (printReplica) return "Print Replica";
 
         if (mobiVersion >= 8) return "Kindle Format 8";
@@ -506,8 +512,9 @@ public final class MobiBook extends Book {
         return "PalmDoc";
     }
 
+    @Contract(pure = true)
     @Override
-    public String getBookExtension() {
+    public @NotNull String getBookExtension() {
         if (printReplica) return ".azw4";
 
         if (mobiVersion >= 8) return ".azw3";

@@ -4,6 +4,9 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,7 +94,7 @@ final class IonUtils {
     private IonUtils() {
     }
 
-    public static void addProtTable(BinaryIonParser ion) {
+    public static void addProtTable(@NotNull BinaryIonParser ion) {
         ion.addToCatalog("ProtectedData", 1, SYM_NAMES);
     }
 
@@ -126,7 +129,8 @@ final class IonUtils {
         return obfuscated;
     }
 
-    public static byte[] scramble(byte[] st, int magic) {
+    @Contract(pure = true)
+    public static byte @NotNull [] scramble(byte @NotNull [] st, int magic) {
         byte[] ret = new byte[st.length];
         int padLen = st.length;
 
@@ -165,7 +169,8 @@ final class IonUtils {
         return obfuscated;
     }
 
-    public static byte[] scramble3(byte[] st, int magic) {
+    @Contract(pure = true)
+    public static byte @NotNull [] scramble3(byte @NotNull [] st, int magic) {
         byte[] ret = new byte[st.length];
         int padlen = st.length;
         int divs = padlen / magic;
@@ -271,7 +276,7 @@ final class IonUtils {
         return obfuscated;
     }
 
-    public static byte[] processV9708(byte[] st) {
+    public static byte @NotNull [] processV9708(byte @NotNull [] st) {
         Workspace ws = new Workspace(new int[]{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11});
         int[] repl = new int[]{0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11};
 
@@ -297,7 +302,7 @@ final class IonUtils {
         return toByteArray(out, st.length);
     }
 
-    public static byte[] processV1031(byte[] st) {
+    public static byte @NotNull [] processV1031(byte @NotNull [] st) {
         Workspace ws = new Workspace(Arrays.asList(0x06, 0x18, 0x60, 0x68, 0x3B, 0x62, 0x3E, 0x3C, 0x06, 0x50, 0x71, 0x52, 0x02, 0x5A, 0x63, 0x03));
         List<Integer> repl = Arrays.asList(0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11);
         int remln = st.length;

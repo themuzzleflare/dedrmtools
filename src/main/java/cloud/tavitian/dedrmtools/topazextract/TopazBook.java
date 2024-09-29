@@ -5,6 +5,8 @@
 package cloud.tavitian.dedrmtools.topazextract;
 
 import cloud.tavitian.dedrmtools.Book;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 public final class TopazBook extends Book {
     private static final String VERSION = "1.0";
@@ -15,13 +17,15 @@ public final class TopazBook extends Book {
         System.out.println("Removes DRM protection from Topaz eBooks and extracts the contents.");
     }
 
+    @Contract(pure = true)
     @Override
-    public String getBookType() {
+    public @NotNull String getBookType() {
         return "Topaz";
     }
 
+    @Contract(pure = true)
     @Override
-    public String getBookExtension() {
+    public @NotNull String getBookExtension() {
         return ".htmlz";
     }
 }

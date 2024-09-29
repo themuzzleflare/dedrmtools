@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ final class DRMIonVoucher {
     private byte[] cipherIv;
     private byte[] secretKey;
 
-    public DRMIonVoucher(BytesIOInputStream voucherenv, String dsn, String secret) {
+    public DRMIonVoucher(BytesIOInputStream voucherenv, @NotNull String dsn, @NotNull String secret) {
         this.dsn = dsn.getBytes(StandardCharsets.US_ASCII);
         this.secret = secret.getBytes(StandardCharsets.US_ASCII);
         envelope = new BinaryIonParser(voucherenv);

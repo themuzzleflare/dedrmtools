@@ -18,21 +18,24 @@
 
     <name>Kindle DeDRM Tools</name>
     <description>Tools for removing DRM encryption from Amazon Kindle eBooks.</description>
+    <url>https://github.com/themuzzleflare/dedrmtools</url>
+
+    <properties>
+        <kindlekey.macos.test.path>**/KindleKeyMacOSTest.java</kindlekey.macos.test.path>
+        <kindlekey.windows.test.path>**/KindleKeyWindowsTest.java</kindlekey.windows.test.path>
+    </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.tukaani/xz -->
         <dependency>
             <groupId>org.tukaani</groupId>
             <artifactId>xz</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform-jpms -->
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform-jpms</artifactId>
@@ -41,7 +44,6 @@
 
     <build>
         <plugins>
-            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -59,11 +61,13 @@
     <profiles>
         <profile>
             <id>dedrmtools-mac-test</id>
+
             <activation>
                 <os>
                     <name>Mac OS X</name>
                 </os>
             </activation>
+
             <build>
                 <plugins>
                     <plugin>
@@ -71,7 +75,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <excludes>
-                                <exclude>**/KindleKeyWindowsTest.java</exclude>
+                                <exclude>${kindlekey.windows.test.path}</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -81,11 +85,13 @@
 
         <profile>
             <id>dedrmtools-win-test</id>
+
             <activation>
                 <os>
                     <family>windows</family>
                 </os>
             </activation>
+
             <build>
                 <plugins>
                     <plugin>
@@ -93,7 +99,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <excludes>
-                                <exclude>**/KindleKeyMacOSTest.java</exclude>
+                                <exclude>${kindlekey.macos.test.path}</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -103,11 +109,13 @@
 
         <profile>
             <id>dedrmtools-linux-test</id>
+
             <activation>
                 <os>
                     <name>Linux</name>
                 </os>
             </activation>
+
             <build>
                 <plugins>
                     <plugin>
@@ -115,8 +123,8 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <excludes>
-                                <exclude>**/KindleKeyMacOSTest.java</exclude>
-                                <exclude>**/KindleKeyWindowsTest.java</exclude>
+                                <exclude>${kindlekey.macos.test.path}</exclude>
+                                <exclude>${kindlekey.windows.test.path}</exclude>
                             </excludes>
                         </configuration>
                     </plugin>

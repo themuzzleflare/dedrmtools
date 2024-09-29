@@ -4,12 +4,14 @@
 
 package cloud.tavitian.dedrmtools;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Set;
 
 import static cloud.tavitian.dedrmtools.Util.commaSeparatedStringToSanitisedSet;
 
 public final class Main {
-    public static void main(String[] args) {
+    public static void main(String @NotNull [] args) {
         if (args.length == 0) {
             usage();
             System.exit(1);

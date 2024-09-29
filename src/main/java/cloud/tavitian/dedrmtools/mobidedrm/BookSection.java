@@ -4,9 +4,13 @@
 
 package cloud.tavitian.dedrmtools.mobidedrm;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 record BookSection(int offset, int flags, int val) {
+    @Contract(pure = true)
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return String.format("(%d, %d, %d)", offset, flags, val);
     }
 }

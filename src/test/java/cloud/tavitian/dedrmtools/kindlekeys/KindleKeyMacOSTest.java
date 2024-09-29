@@ -12,6 +12,6 @@ final class KindleKeyMacOSTest {
     @Test
     void getMacAddressesMunged() {
         Set<byte[]> macAddressesMunged = KindleKeyMacOS.getMacAddressesMunged();
-        System.out.println("Mac addresses munged:" + macAddressesMunged);
+        System.out.printf("macAddressesMunged: %s%n", macAddressesMunged);
     }
 }

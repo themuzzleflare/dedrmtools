@@ -4,6 +4,10 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -22,9 +26,9 @@ final class BinaryIonParser {
     private final List<IonCatalogItem> catalog = new ArrayList<>();
     private final SymbolTable symbols = new SymbolTable();
     private boolean eof = false;
-    private ParserState state;
-    private int localRemaining = 0;
-    private boolean needHasNext = false;
+    private ParserState state = ParserState.BEFORE_TID;
+    private int localRemaining = -1;
+    private boolean needHasNext = true;
     private boolean isInStruct = false;
     private int valueTid = -1;
     private int valueFieldId = -1;
@@ -37,9 +41,9 @@ final class BinaryIonParser {
 
     private Object value;
     private boolean didImports = false;
-    private List<ContainerRec> containerStack;
+    private List<ContainerRec> containerStack = new ArrayList<>();
 
-    public BinaryIonParser(BytesIOInputStream stream) {
+    public BinaryIonParser(@NotNull BytesIOInputStream stream) {
         this.stream = stream;
         initPos = stream.tell();
 
@@ -193,11 +197,11 @@ final class BinaryIonParser {
         annotations.clear();
     }
 
-    private synchronized byte[] read() throws IOException {
+    private synchronized byte @NotNull [] read() throws IOException {
         return read(1);
     }
 
-    private synchronized byte[] read(int count) throws IOException {
+    private synchronized byte @NotNull [] read(int count) throws IOException {
         if (localRemaining != -1) {
             localRemaining -= count;
 
@@ -462,7 +466,7 @@ final class BinaryIonParser {
         } else symbols.importUnknown(name, maxId);
     }
 
-    private synchronized IonCatalogItem findCatalogItem(String name) {
+    private synchronized @Nullable IonCatalogItem findCatalogItem(String name) {
         for (IonCatalogItem item : catalog) if (item.name().equals(name)) return item;
         return null; // Return null if no matching item is found
     }
@@ -494,7 +498,7 @@ final class BinaryIonParser {
             throw new IllegalStateException(String.format("Expected a string value but found: %s", value.getClass().getSimpleName()));
     }
 
-    private synchronized String symbolValue() throws IOException {
+    private synchronized @NotNull String symbolValue() throws IOException {
         if (valueTid != TID_SYMBOL) throw new IllegalStateException("Not a symbol");
 
         prepareValue();
@@ -509,7 +513,7 @@ final class BinaryIonParser {
             throw new IllegalStateException(String.format("Expected an integer value for symbol ID but found: %s", value.getClass().getSimpleName()));
     }
 
-    public synchronized byte[] lobValue() throws IOException {
+    public synchronized byte @Nullable [] lobValue() throws IOException {
         if (valueTid != TID_CLOB && valueTid != TID_BLOB)
             throw new IllegalStateException(String.format("Not a LOB type: %s", getFieldName()));
 
@@ -538,8 +542,9 @@ final class BinaryIonParser {
         return symbols.findById(valueFieldId);
     }
 
+    @Contract(" -> new")
     @SuppressWarnings("unused")
-    private synchronized SymbolToken getFieldNameSymbol() {
+    private synchronized @NotNull SymbolToken getFieldNameSymbol() {
         return new SymbolToken(getFieldName(), valueFieldId);
     }
 
@@ -635,7 +640,7 @@ final class BinaryIonParser {
         }
     }
 
-    private synchronized String printLob(byte[] b) {
+    private synchronized @NotNull String printLob(byte[] b) {
         if (b == null) return "null";
 
         StringBuilder result = new StringBuilder();

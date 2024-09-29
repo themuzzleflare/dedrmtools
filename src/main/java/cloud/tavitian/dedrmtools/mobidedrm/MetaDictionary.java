@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.mobidedrm;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,7 +14,7 @@ import static cloud.tavitian.dedrmtools.Util.formatByteArray;
 
 final class MetaDictionary extends LinkedHashMap<Integer, byte[]> {
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         Iterator<Map.Entry<Integer, byte[]>> i = entrySet().iterator();
 
         if (!i.hasNext()) return "{}";

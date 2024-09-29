@@ -7,6 +7,8 @@ package cloud.tavitian.dedrmtools.kfxdedrm;
 import cloud.tavitian.dedrmtools.Book;
 import cloud.tavitian.dedrmtools.BookFile;
 import cloud.tavitian.dedrmtools.Debug;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -39,18 +41,20 @@ public final class KFXZipBook extends Book {
     }
 
     @Override
-    public String getBookTitle() {
+    public @NotNull String getBookTitle() {
         BookFile bookFile = new BookFile(infile);
         return bookFile.getRoot();
     }
 
+    @Contract(pure = true)
     @Override
-    public String getBookType() {
+    public @NotNull String getBookType() {
         return "KFX-ZIP";
     }
 
+    @Contract(pure = true)
     @Override
-    public String getBookExtension() {
+    public @NotNull String getBookExtension() {
         return ".kfx-zip";
     }
 
