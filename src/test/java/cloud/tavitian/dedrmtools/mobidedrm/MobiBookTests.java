@@ -5,14 +5,17 @@
 package cloud.tavitian.dedrmtools.mobidedrm;
 
 import cloud.tavitian.dedrmtools.PIDMetaInfo;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-final class MobiBookTest {
+@DisplayName("MobiBook Tests")
+final class MobiBookTests {
     @Test
+    @DisplayName("Get PID Meta Info Test")
     void getPidMetaInfo() throws Exception {
         // from test resources folder
         final String book1 = Objects.requireNonNull(getClass().getClassLoader().getResource("einkbookfiles/1.azw3")).getPath();
@@ -51,6 +54,7 @@ final class MobiBookTest {
     }
 
     @Test
+    @DisplayName("Process Book Test")
     void processBook() throws Exception {
         // read non-DRM books from test resources folder
         final byte[] noDrmBook1 = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("einkbookfilesnodrm/1.azw3")).readAllBytes();

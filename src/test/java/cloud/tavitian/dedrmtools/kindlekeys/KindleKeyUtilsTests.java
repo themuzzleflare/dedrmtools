@@ -4,14 +4,17 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-final class KindleKeyUtilsTest {
+@DisplayName("KindleKeyUtils Tests")
+final class KindleKeyUtilsTests {
     @Test
+    @DisplayName("CRC32 Test")
     void crc32() {
         byte[] pid1 = "vCNIml/c".getBytes(StandardCharsets.US_ASCII);
         byte[] pid2 = "JBJfi+Wm".getBytes(StandardCharsets.US_ASCII);

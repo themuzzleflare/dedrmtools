@@ -21,8 +21,8 @@
     <url>https://github.com/themuzzleflare/dedrmtools</url>
 
     <properties>
-        <kindlekey.macos.test.path>**/KindleKeyMacOSTest.java</kindlekey.macos.test.path>
-        <kindlekey.windows.test.path>**/KindleKeyWindowsTest.java</kindlekey.windows.test.path>
+        <kindlekey.macos.test.path>**/KindleKeyMacOSTests.java</kindlekey.macos.test.path>
+        <kindlekey.windows.test.path>**/KindleKeyWindowsTests.java</kindlekey.windows.test.path>
     </properties>
 
     <dependencies>

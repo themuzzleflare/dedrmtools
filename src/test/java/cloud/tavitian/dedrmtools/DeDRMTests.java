@@ -4,6 +4,9 @@
 
 package cloud.tavitian.dedrmtools;
 
+import org.junit.jupiter.api.DisplayName;
+
 @SuppressWarnings("unused")
-final class DeDRMTest {
+@DisplayName("DeDRM Tests")
+final class DeDRMTests {
 }

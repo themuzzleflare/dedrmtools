@@ -4,6 +4,7 @@
 
 package cloud.tavitian.dedrmtools;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashSet;
@@ -11,8 +12,10 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-final class UtilTest {
+@DisplayName("Util Tests")
+final class UtilTests {
     @Test
+    @DisplayName("Format Byte Array Test")
     void formatByteArray() {
         byte[] bytes1 = {(byte) 0xEA, 'D', 'R', 'M', 'I', 'O', 'N', (byte) 0xEE};
         byte[] bytes2 = {'T', 'P', 'Z'};
@@ -32,6 +35,7 @@ final class UtilTest {
     }
 
     @Test
+    @DisplayName("To Set Test")
     void toSet() {
         for (int i = 0; i < 1000; i++) {
             Set<String> expectedSet1 = new LinkedHashSet<>() {{
@@ -71,6 +75,7 @@ final class UtilTest {
     }
 
     @Test
+    @DisplayName("Comma Separated String To Sanitised Set Test")
     void commaSeparatedStringToSanitisedSet() {
         String str1 = "a,b,c";
         String str2 = "a, b, c";
