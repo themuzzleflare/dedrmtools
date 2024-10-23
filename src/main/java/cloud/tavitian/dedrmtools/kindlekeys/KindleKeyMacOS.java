@@ -94,7 +94,7 @@ final class KindleKeyMacOS extends KindleKey {
         return macNums;
     }
 
-    private static Set<byte[]> getVolumeSerialNumbers() {
+    static Set<byte[]> getVolumeSerialNumbers() {
         Set<byte[]> serNums = new BytesSet();
 
         String serNum = System.getenv("MYSERIALNUMBER");
@@ -174,7 +174,7 @@ final class KindleKeyMacOS extends KindleKey {
         }
     }
 
-    private static Set<byte[]> getDiskPartitionNames() {
+    static Set<byte[]> getDiskPartitionNames() {
         Set<byte[]> names = new BytesSet();
 
         // Command to list mounted partitions
@@ -211,7 +211,7 @@ final class KindleKeyMacOS extends KindleKey {
         return names;
     }
 
-    private static Set<byte[]> getDiskPartitionUUIDs() {
+    static Set<byte[]> getDiskPartitionUUIDs() {
         Set<byte[]> uuids = new BytesSet();
 
         String uuidNum = System.getenv("MYUUIDNUMBER");
@@ -251,7 +251,7 @@ final class KindleKeyMacOS extends KindleKey {
         return uuids;
     }
 
-    private static Set<byte[]> getIdStrings() {
+    static Set<byte[]> getIdStrings() {
         // Return all possible ID Strings
         Set<byte[]> strings = new BytesSet();
 

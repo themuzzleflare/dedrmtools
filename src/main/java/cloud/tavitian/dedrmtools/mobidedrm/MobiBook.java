@@ -256,11 +256,11 @@ public final class MobiBook extends Book {
         String foundPid = null;
 
         // b'\x72\x38\x33\xB0\xB4\xF2\xE3\xCA\xDF\x09\x01\xD6\xE2\xE0\x3F\x96'
-        byte[] keyvec1 = new byte[]{
-                (byte) 0x72, (byte) 0x38, (byte) 0x33, (byte) 0xB0,
+        byte[] keyvec1 = {
+                0x72, 0x38, 0x33, (byte) 0xB0,
                 (byte) 0xB4, (byte) 0xF2, (byte) 0xE3, (byte) 0xCA,
-                (byte) 0xDF, (byte) 0x09, (byte) 0x01, (byte) 0xD6,
-                (byte) 0xE2, (byte) 0xE0, (byte) 0x3F, (byte) 0x96
+                (byte) 0xDF, 0x09, 0x01, (byte) 0xD6,
+                (byte) 0xE2, (byte) 0xE0, 0x3F, (byte) 0x96
         };
 
         for (String pid : pidSet) {

@@ -96,10 +96,9 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
     }
 
     public static KindleDatabase loadFromFile(String filename) throws IOException {
-        FileReader fileReader = new FileReader(filename);
-        KindleDatabase result = GSON.fromJson(fileReader, KindleDatabase.class);
-        fileReader.close();
-        return result;
+        try (FileReader fileReader = new FileReader(filename)) {
+            return GSON.fromJson(fileReader, KindleDatabase.class);
+        }
     }
 
     public void writeToFile(File file) throws IOException {
@@ -107,9 +106,9 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
     }
 
     public void writeToFile(String filename) throws IOException {
-        FileWriter fileWriter = new FileWriter(filename);
-        GSON.toJson(this, fileWriter);
-        fileWriter.close();
+        try (FileWriter fileWriter = new FileWriter(filename)) {
+            GSON.toJson(this, fileWriter);
+        }
     }
 
     public String getKindleAccountToken() {
