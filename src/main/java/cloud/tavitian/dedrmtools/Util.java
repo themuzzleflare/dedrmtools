@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 Paul Tavitian.
+ * Copyright © 2024-2025 Paul Tavitian.
  */
 
 package cloud.tavitian.dedrmtools;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public final class Util {
-    public static final String COPYRIGHT = "Copyright © 2024 Paul Tavitian";
+    public static final String COPYRIGHT = "Copyright © 2024-2025 Paul Tavitian";
 
     private Util() {
     }

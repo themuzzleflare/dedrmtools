@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 Paul Tavitian.
+ * Copyright © 2024-2025 Paul Tavitian.
  */
 
 package cloud.tavitian.dedrmtools;
@@ -28,7 +28,7 @@ import static cloud.tavitian.dedrmtools.Util.*;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindlePID.getPidSet;
 
 public final class DeDRM {
-    private static final String VERSION = "2.0";
+    private static final String VERSION = "3.0";
 
     private DeDRM() {
     }

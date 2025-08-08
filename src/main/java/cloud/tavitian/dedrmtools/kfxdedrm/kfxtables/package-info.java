@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 Paul Tavitian.
+ * Copyright © 2024-2025 Paul Tavitian.
  */
 
 /**
