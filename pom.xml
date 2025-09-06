@@ -11,7 +11,7 @@
     <parent>
         <groupId>cloud.tavitian</groupId>
         <artifactId>kindlededrm</artifactId>
-        <version>12.0.0</version>
+        <version>13.0.0</version>
     </parent>
 
     <artifactId>dedrmtools</artifactId>
@@ -60,6 +60,37 @@
 
     <profiles>
         <profile>
+            <id>dedrmtools-mac-compile</id>
+
+            <activation>
+                <os>
+                    <name>Mac OS X</name>
+                </os>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/KindleKeyWindows.java</exclude>
+                                <exclude>**/Advapi32.java</exclude>
+                                <exclude>**/Crypt32.java</exclude>
+                                <exclude>**/DATA_BLOB.java</exclude>
+                                <exclude>**/Kernel32.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <testExclude>${kindlekey.windows.test.path}</testExclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
             <id>dedrmtools-mac-test</id>
 
             <activation>
@@ -84,6 +115,35 @@
         </profile>
 
         <profile>
+            <id>dedrmtools-win-compile</id>
+
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/KindleKeyMacOS.java</exclude>
+                                <exclude>**/SystemProfilerStorageDriveDataTypes.java</exclude>
+                                <exclude>**/IORegStorageDriveClasses.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <testExclude>${kindlekey.macos.test.path}</testExclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
             <id>dedrmtools-win-test</id>
 
             <activation>
@@ -98,6 +158,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <argLine>--enable-native-access=com.sun.jna</argLine>
                             <excludes>
                                 <exclude>${kindlekey.macos.test.path}</exclude>
                             </excludes>
@@ -107,30 +168,6 @@
             </build>
         </profile>
 
-        <profile>
-            <id>dedrmtools-linux-test</id>
-
-            <activation>
-                <os>
-                    <name>Linux</name>
-                </os>
-            </activation>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>${kindlekey.macos.test.path}</exclude>
-                                <exclude>${kindlekey.windows.test.path}</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 
 </project>

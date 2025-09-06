@@ -45,6 +45,7 @@ final class BinaryIonParser {
 
     public BinaryIonParser(@NotNull BytesIOInputStream stream) {
         this.stream = stream;
+
         initPos = stream.tell();
 
         reset();

@@ -44,7 +44,6 @@ final class UtilTests {
                 add("c");
             }};
 
-
             Set<String> expectedSet2 = new LinkedHashSet<>() {{
                 add("a");
                 add("b");
@@ -102,7 +101,6 @@ final class UtilTests {
                 add("b");
                 add("c");
             }};
-
 
             Set<String> expectedSet4 = new LinkedHashSet<>() {{
                 add("a");

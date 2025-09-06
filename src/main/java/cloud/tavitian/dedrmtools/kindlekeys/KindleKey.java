@@ -18,11 +18,26 @@ import static cloud.tavitian.dedrmtools.Util.*;
 
 public abstract class KindleKey implements KindleKeyManager {
     private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
+    private static final String PACKAGE_NAME = KindleKey.class.getPackageName();
+    private static final String WIN_CLASS_NAME = "KindleKeyWindows";
+    private static final String MAC_CLASS_NAME = "KindleKeyMacOS";
 
     public static KindleKey getInstance() throws Exception {
-        if (OS_NAME.startsWith("win")) return new KindleKeyWindows();
-        else if (OS_NAME.startsWith("mac") || OS_NAME.startsWith("darwin")) return new KindleKeyMacOS();
-        else throw new Exception(String.format("Unsupported OS: %s", OS_NAME));
+        if (OS_NAME.startsWith("win")) {
+            if (PACKAGE_NAME.isEmpty()) {
+                return (KindleKey) Class.forName(WIN_CLASS_NAME).getDeclaredConstructor().newInstance();
+            } else {
+                return (KindleKey) Class.forName(PACKAGE_NAME + "." + WIN_CLASS_NAME).getDeclaredConstructor().newInstance();
+            }
+        } else if (OS_NAME.startsWith("mac") || OS_NAME.startsWith("darwin")) {
+            if (PACKAGE_NAME.isEmpty()) {
+                return (KindleKey) Class.forName(MAC_CLASS_NAME).getDeclaredConstructor().newInstance();
+            } else {
+                return (KindleKey) Class.forName(PACKAGE_NAME + "." + MAC_CLASS_NAME).getDeclaredConstructor().newInstance();
+            }
+        } else {
+            throw new Exception(String.format("Unsupported OS: %s", OS_NAME));
+        }
     }
 
     // Method to decrypt the encrypted data using a derived key and IV
