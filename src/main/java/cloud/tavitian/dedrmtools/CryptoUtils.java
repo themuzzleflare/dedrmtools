@@ -4,6 +4,7 @@
 
 package cloud.tavitian.dedrmtools;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.*;
@@ -18,6 +19,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
 public final class CryptoUtils {
+    @Contract(pure = true)
     private CryptoUtils() {
     }
 

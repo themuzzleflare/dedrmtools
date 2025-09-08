@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
+import org.jetbrains.annotations.Contract;
+
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 
@@ -55,6 +57,7 @@ final class ObfuscationTable extends LinkedHashMap<String, ObfuscationValue> {
         put("V5683", new ObfuscationValue(0x05, new byte[]{0x7a, 0x33, 0x0a, 0x03, 0x39, 0x12, 0x13, 0x60, 0x06, 0x3d, 0x76, 0x3b, 0x02, 0x4d, 0x54, 0x4b, 0x1e, 0x25, 0x7d, 0x4c, 0x1c, 0x1f, 0x15, 0x0c, 0x11, 0x02, 0x0c, 0x0a, 0x38, 0x17, 0x70}));
     }
 
+    @Contract(pure = true)
     public static ObfuscationTable getInstance() {
         return instance;
     }

@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
+import org.jetbrains.annotations.Contract;
+
 import java.io.ByteArrayInputStream;
 
 final class BytesIOInputStream extends ByteArrayInputStream {
@@ -11,6 +13,7 @@ final class BytesIOInputStream extends ByteArrayInputStream {
         super(buf);
     }
 
+    @Contract(pure = true)
     public synchronized int tell() {
         return pos;
     }

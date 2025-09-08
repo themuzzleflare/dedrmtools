@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools;
 
+import org.jetbrains.annotations.Contract;
+
 import java.nio.charset.StandardCharsets;
 
 public final class CharMaps {
@@ -24,6 +26,7 @@ public final class CharMaps {
     public static final byte[] pkBytes = {0x50, 0x4B, 0x03, 0x04};
     public static final byte[] pidv3Bytes = "PIDv3".getBytes(StandardCharsets.US_ASCII);
 
+    @Contract(pure = true)
     private CharMaps() {
     }
 }

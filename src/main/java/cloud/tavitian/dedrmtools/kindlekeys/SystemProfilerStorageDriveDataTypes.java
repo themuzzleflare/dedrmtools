@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.Set;
 
 public final class SystemProfilerStorageDriveDataTypes {
@@ -12,6 +14,7 @@ public final class SystemProfilerStorageDriveDataTypes {
 
     public static final Set<String> all = Set.of(SP_SERIAL_ATA_DATA_TYPE, SP_NVME_DATA_TYPE);
 
+    @Contract(pure = true)
     private SystemProfilerStorageDriveDataTypes() {
     }
 }

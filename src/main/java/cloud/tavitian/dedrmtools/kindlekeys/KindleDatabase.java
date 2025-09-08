@@ -6,6 +6,7 @@ package cloud.tavitian.dedrmtools.kindlekeys;
 
 import cloud.tavitian.dedrmtools.Debug;
 import com.google.gson.Gson;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
@@ -81,7 +82,7 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
     }
 
     @SuppressWarnings("unused")
-    public KindleDatabase(File file) throws IOException {
+    public KindleDatabase(@NotNull File file) throws IOException {
         this(file.getAbsolutePath());
     }
 
@@ -91,7 +92,7 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
     }
 
     @SuppressWarnings("unused")
-    public static KindleDatabase loadFromFile(File file) throws IOException {
+    public static KindleDatabase loadFromFile(@NotNull File file) throws IOException {
         return loadFromFile(file.getAbsolutePath());
     }
 
@@ -101,7 +102,7 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
         }
     }
 
-    public void writeToFile(File file) throws IOException {
+    public void writeToFile(@NotNull File file) throws IOException {
         writeToFile(file.getAbsolutePath());
     }
 
@@ -312,7 +313,7 @@ public class KindleDatabase extends LinkedHashMap<String, String> {
      * @return The encoded SHA-1 hash of the concatenation of <code>MazamaRandomNumber</code>, {@link #genEncodedIdString()}, and {@link #genEncodedUsername()}, as a byte array.
      * @throws NoSuchAlgorithmException If the SHA-1 algorithm is not available.
      */
-    private byte[] genAltDSN() throws NoSuchAlgorithmException {
+    private byte @NotNull [] genAltDSN() throws NoSuchAlgorithmException {
         return encode(sha1(getMazamaRandomNumberBytes(), genEncodedIdString(), genEncodedUsername()), charMap1);
     }
 }

@@ -4,6 +4,7 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import static cloud.tavitian.dedrmtools.Util.toIntegerList;
 final class Workspace {
     private List<Integer> work;
 
+    @Contract(pure = true)
     public Workspace(List<Integer> initialList) {
         work = initialList;
     }

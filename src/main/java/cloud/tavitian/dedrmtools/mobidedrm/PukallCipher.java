@@ -16,6 +16,7 @@ final class PukallCipher {
     private static final int KEY_XOR_MULTIPLIER = 257;
     private static final int MASK16 = 0xFFFF;
 
+    @Contract(pure = true)
     private PukallCipher() {
     }
 

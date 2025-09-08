@@ -91,6 +91,7 @@ final class IonUtils {
             add(String.format("com.amazon.drm.VoucherEnvelope@%d.0", n));
     }};
 
+    @Contract(pure = true)
     private IonUtils() {
     }
 

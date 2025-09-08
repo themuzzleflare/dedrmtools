@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
+import org.jetbrains.annotations.Contract;
+
 enum ParserState {
     INVALID(1),
     BEFORE_FIELD(2),
@@ -14,10 +16,12 @@ enum ParserState {
 
     private final int value;
 
+    @Contract(pure = true)
     ParserState(int value) {
         this.value = value;
     }
 
+    @Contract(pure = true)
     @SuppressWarnings("unused")
     public int getValue() {
         return value;

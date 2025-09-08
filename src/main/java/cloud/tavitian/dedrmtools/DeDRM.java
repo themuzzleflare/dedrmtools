@@ -11,6 +11,7 @@ import cloud.tavitian.dedrmtools.kindlekeys.KindleKey;
 import cloud.tavitian.dedrmtools.mobidedrm.MobiBook;
 import cloud.tavitian.dedrmtools.topazextract.TopazBook;
 import org.apache.commons.text.StringEscapeUtils;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileInputStream;
@@ -30,6 +31,7 @@ import static cloud.tavitian.dedrmtools.kindlekeys.KindlePID.getPidSet;
 public final class DeDRM {
     private static final String VERSION = "3.0";
 
+    @Contract(pure = true)
     private DeDRM() {
     }
 

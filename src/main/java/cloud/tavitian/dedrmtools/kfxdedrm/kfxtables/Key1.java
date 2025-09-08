@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm.kfxtables;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -623,6 +625,7 @@ final class Key1 {
             0xe7c96534, 0xc6febd86, 0xbb020afd, 0x864e4938, 0xfc88844c, 0xefb7e80f, 0xbd2414be, 0x3b6a5d86,
             0x55a986be, 0x5fceb981, 0x1e622973, 0x3c502789, 0x250874f5, 0x61872c0c, 0x4dedb18e, 0xce8030bd));
 
+    @Contract(pure = true)
     private Key1() {
     }
 }

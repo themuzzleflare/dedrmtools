@@ -4,6 +4,9 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -14,12 +17,13 @@ import static cloud.tavitian.dedrmtools.HashUtils.md5;
 import static cloud.tavitian.dedrmtools.Util.indexOf;
 
 public final class KindleKeyUtils {
+    @Contract(pure = true)
     private KindleKeyUtils() {
     }
 
     // Encode the bytes in data using the characters in charMap
     // Both data and charMap should be byte arrays
-    static byte[] encode(byte[] data, byte[] charMap) {
+    static byte @NotNull [] encode(byte @NotNull [] data, byte[] charMap) {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
 
         for (byte b : data) {
@@ -36,12 +40,12 @@ public final class KindleKeyUtils {
     }
 
     // Hash the bytes in data and then encode the digest with the characters in map
-    static byte[] encodeHash(byte[] data, byte[] charMap) throws NoSuchAlgorithmException {
+    static byte @NotNull [] encodeHash(byte[] data, byte[] charMap) throws NoSuchAlgorithmException {
         return encode(md5(data), charMap);
     }
 
     // Decode the byte array `data` using the byte array `map`. Returns the decoded bytes as a new byte array.
-    static byte[] decode(byte[] data, byte[] map) {
+    static byte[] decode(byte @NotNull [] data, byte[] map) {
         byte[] result = new byte[0];
 
         for (int i = 0; i < data.length - 1; i += 2) {
@@ -72,11 +76,12 @@ public final class KindleKeyUtils {
         return ~crc32.getValue() & 0xFFFFFFFFL;
     }
 
-    public static String checksumPid(String data, byte[] charMap) throws IOException {
+    @Contract("_, _ -> new")
+    public static @NotNull String checksumPid(@NotNull String data, byte[] charMap) throws IOException {
         return new String(checksumPid(data.getBytes(), charMap));
     }
 
-    public static byte[] checksumPid(byte[] data, byte[] charMap) throws IOException {
+    public static byte @NotNull [] checksumPid(byte[] data, byte[] charMap) throws IOException {
         int crc = (int) crc32(data);
 
         crc = crc ^ (crc >> 16);

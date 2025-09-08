@@ -4,6 +4,7 @@
 
 package cloud.tavitian.dedrmtools.kfxdedrm;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
@@ -251,10 +252,12 @@ final class DRMIonVoucher {
         }
     }
 
+    @Contract(pure = true)
     public String getLicenceType() {
         return licenceType;
     }
 
+    @Contract(pure = true)
     public byte[] getSecretKey() {
         return secretKey;
     }

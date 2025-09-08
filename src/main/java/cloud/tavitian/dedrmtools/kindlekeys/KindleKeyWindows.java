@@ -11,6 +11,8 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,7 +42,7 @@ final class KindleKeyWindows extends KindleKey {
     @SuppressWarnings("unused")
     private static final byte[] testMap6 = "9YzAb0Cd1Ef2n5Pr6St7Uvh3Jk4M8WxG".getBytes(StandardCharsets.US_ASCII);
 
-    private static String getSystemDirectory() {
+    private static @NotNull String getSystemDirectory() {
         char[] buffer = new char[256];
 
         Kernel32.INSTANCE.GetSystemDirectoryW(buffer, buffer.length);
@@ -52,7 +54,7 @@ final class KindleKeyWindows extends KindleKey {
         return sysDir;
     }
 
-    private static String getVolumeSerialNumber() {
+    private static @NotNull String getVolumeSerialNumber() {
         char[] volumeNameBuffer = new char[256];
 
         IntByReference serialNumber = new IntByReference();
@@ -72,7 +74,7 @@ final class KindleKeyWindows extends KindleKey {
         return serialnum;
     }
 
-    private static byte[] cryptUnprotectData(byte[] data, byte[] entropy, @SuppressWarnings("SameParameterValue") int flags) {
+    private static byte[] cryptUnprotectData(byte @NotNull [] data, byte @NotNull [] entropy, @SuppressWarnings("SameParameterValue") int flags) {
         DATA_BLOB inData = new DATA_BLOB();
         inData.pbData = new Memory(data.length);
         inData.cbData = data.length;
@@ -93,14 +95,14 @@ final class KindleKeyWindows extends KindleKey {
     }
 
     @SuppressWarnings("unused")
-    private static String getEnvironmentVariable(String name) {
+    private static @Nullable String getEnvironmentVariable(String name) {
         char[] buffer = new char[256];
         int size = Kernel32.INSTANCE.GetEnvironmentVariableW(name, buffer, buffer.length);
         if (size == 0) return null;
         return Native.toString(buffer);
     }
 
-    private static void checkAndAddFile(KindlePath testPath, Set<String> kInfoFiles) {
+    private static void checkAndAddFile(@NotNull KindlePath testPath, Set<String> kInfoFiles) {
         File file = new File(testPath.path());
 
         if (file.isFile()) {
@@ -109,12 +111,12 @@ final class KindleKeyWindows extends KindleKey {
         }
     }
 
-    private static byte[] getIdString() {
+    private static byte @NotNull [] getIdString() {
         return getVolumeSerialNumber().getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
-    public byte[] getUsername() {
+    public byte @NotNull [] getUsername() {
         char[] buffer = new char[256];
 
         IntByReference size = new IntByReference(buffer.length);
@@ -134,7 +136,7 @@ final class KindleKeyWindows extends KindleKey {
     }
 
     @Override
-    public Set<String> getKindleInfoFiles() {
+    public @NotNull Set<String> getKindleInfoFiles() {
         Set<String> kInfoFiles = new LinkedHashSet<>();
 
         String path = "";

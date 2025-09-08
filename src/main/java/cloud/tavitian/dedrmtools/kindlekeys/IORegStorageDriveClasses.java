@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.Set;
 
 public final class IORegStorageDriveClasses {
@@ -15,6 +17,7 @@ public final class IORegStorageDriveClasses {
             APPLE_ANS3_NVME_CONTROLLER
     );
 
+    @Contract(pure = true)
     private IORegStorageDriveClasses() {
     }
 }

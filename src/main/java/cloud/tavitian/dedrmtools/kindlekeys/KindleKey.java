@@ -5,6 +5,7 @@
 package cloud.tavitian.dedrmtools.kindlekeys;
 
 import cloud.tavitian.dedrmtools.Debug;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public abstract class KindleKey implements KindleKeyManager {
     private static final String WIN_CLASS_NAME = "KindleKeyWindows";
     private static final String MAC_CLASS_NAME = "KindleKeyMacOS";
 
-    public static KindleKey getInstance() throws Exception {
+    public static @NotNull KindleKey getInstance() throws Exception {
         if (OS_NAME.startsWith("win")) {
             if (PACKAGE_NAME.isEmpty()) {
                 return (KindleKey) Class.forName(WIN_CLASS_NAME).getDeclaredConstructor().newInstance();

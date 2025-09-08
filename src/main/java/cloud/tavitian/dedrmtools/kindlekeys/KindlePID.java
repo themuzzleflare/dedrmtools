@@ -22,6 +22,7 @@ import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.checksumPid;
 import static cloud.tavitian.dedrmtools.kindlekeys.KindleKeyUtils.crc32;
 
 public final class KindlePID {
+    @Contract(pure = true)
     private KindlePID() {
     }
 
@@ -47,6 +48,7 @@ public final class KindlePID {
     }
 
     // Seed value used to generate the device PID
+    @Contract(pure = true)
     private static int generatePidSeed(int[] table, byte[] dsn) {
         int value = 0;
 

@@ -4,9 +4,12 @@
 
 package cloud.tavitian.dedrmtools;
 
+import org.jetbrains.annotations.Contract;
+
 public final class Debug {
     private static boolean isEnabled = false;
 
+    @Contract(pure = true)
     private Debug() {
     }
 

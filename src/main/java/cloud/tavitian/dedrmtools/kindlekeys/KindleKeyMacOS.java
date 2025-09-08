@@ -6,6 +6,7 @@ package cloud.tavitian.dedrmtools.kindlekeys;
 
 import cloud.tavitian.dedrmtools.BytesSet;
 import cloud.tavitian.dedrmtools.Debug;
+import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -35,7 +36,7 @@ final class KindleKeyMacOS extends KindleKey {
     private static final byte[] charMap2 = "ZB0bYyc1xDdW2wEV3Ff7KkPpL8UuGA4gz-Tme9Nn_tHh5SvXCsIiR6rJjQaqlOoM".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] charMap5 = charMap2;
 
-    static Set<byte[]> getMacAddressesMunged() {
+    static @NotNull Set<byte[]> getMacAddressesMunged() {
         Set<byte[]> macNums = new BytesSet();
 
         String macNum = System.getenv("MYMACNUM");
@@ -94,7 +95,7 @@ final class KindleKeyMacOS extends KindleKey {
         return macNums;
     }
 
-    static Set<byte[]> getVolumeSerialNumbers() {
+    static @NotNull Set<byte[]> getVolumeSerialNumbers() {
         Set<byte[]> serNums = new BytesSet();
 
         String serNum = System.getenv("MYSERIALNUMBER");
@@ -174,7 +175,7 @@ final class KindleKeyMacOS extends KindleKey {
         }
     }
 
-    static Set<byte[]> getDiskPartitionNames() {
+    static @NotNull Set<byte[]> getDiskPartitionNames() {
         Set<byte[]> names = new BytesSet();
 
         // Command to list mounted partitions
@@ -211,7 +212,7 @@ final class KindleKeyMacOS extends KindleKey {
         return names;
     }
 
-    static Set<byte[]> getDiskPartitionUUIDs() {
+    static @NotNull Set<byte[]> getDiskPartitionUUIDs() {
         Set<byte[]> uuids = new BytesSet();
 
         String uuidNum = System.getenv("MYUUIDNUMBER");
@@ -251,7 +252,7 @@ final class KindleKeyMacOS extends KindleKey {
         return uuids;
     }
 
-    static Set<byte[]> getIdStrings() {
+    static @NotNull Set<byte[]> getIdStrings() {
         // Return all possible ID Strings
         Set<byte[]> strings = new BytesSet();
 
@@ -269,7 +270,7 @@ final class KindleKeyMacOS extends KindleKey {
         return strings;
     }
 
-    private static void checkAndAddFile(KindlePath testPath, Set<String> kInfoFiles) {
+    private static void checkAndAddFile(@NotNull KindlePath testPath, Set<String> kInfoFiles) {
         File file = new File(testPath.path());
 
         if (file.exists()) {
@@ -279,7 +280,7 @@ final class KindleKeyMacOS extends KindleKey {
     }
 
     @Override
-    public byte[] getUsername() {
+    public byte @NotNull [] getUsername() {
         // Get the username from the environment variables
         String username = System.getenv("USER");
 
@@ -289,7 +290,7 @@ final class KindleKeyMacOS extends KindleKey {
     }
 
     @Override
-    public Set<String> getKindleInfoFiles() {
+    public @NotNull Set<String> getKindleInfoFiles() {
         // List to store found paths
         Set<String> kInfoFiles = new LinkedHashSet<>();
 

@@ -218,6 +218,7 @@ public final class MobiBook extends Book {
         }
     }
 
+    @Contract(pure = true)
     private static int getSizeOfTrailingDataEntries(byte[] ptr, int size, int flags) {
         int num = 0, testflags = flags >> 1;
 
@@ -233,6 +234,7 @@ public final class MobiBook extends Book {
         return num;
     }
 
+    @Contract(pure = true)
     private static int getSizeOfTrailingDataEntry(byte[] ptr, int size) {
         int bitpos = 0, result = 0;
 

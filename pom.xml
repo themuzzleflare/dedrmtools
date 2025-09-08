@@ -11,7 +11,7 @@
     <parent>
         <groupId>cloud.tavitian</groupId>
         <artifactId>kindlededrm</artifactId>
-        <version>13.0.0</version>
+        <version>14.0.0</version>
     </parent>
 
     <artifactId>dedrmtools</artifactId>

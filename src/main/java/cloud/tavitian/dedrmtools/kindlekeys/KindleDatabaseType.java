@@ -4,6 +4,8 @@
 
 package cloud.tavitian.dedrmtools.kindlekeys;
 
+import org.jetbrains.annotations.Contract;
+
 enum KindleDatabaseType {
     K4MACKINF2018("k4mac kinf2018"),
     K4MACKINF2011("k4mac kinf2011"),
@@ -18,14 +20,17 @@ enum KindleDatabaseType {
 
     private final String name;
 
+    @Contract(pure = true)
     KindleDatabaseType(String name) {
         this.name = name;
     }
 
+    @Contract(pure = true)
     public String getName() {
         return name;
     }
 
+    @Contract(pure = true)
     @Override
     public String toString() {
         return getName();

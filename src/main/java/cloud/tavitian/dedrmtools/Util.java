@@ -12,6 +12,7 @@ import java.util.*;
 public final class Util {
     public static final String COPYRIGHT = "Copyright © 2024-2025 Paul Tavitian";
 
+    @Contract(pure = true)
     private Util() {
     }
 
@@ -62,6 +63,7 @@ public final class Util {
      * @param data The byte array to calculate the sum of.
      * @return The checksum of the byte array.
      */
+    @Contract(pure = true)
     public static int sumBytes(byte[] data) {
         if (data == null) return 0;
 
@@ -76,6 +78,7 @@ public final class Util {
      * @param data The byte array to search for a null byte.
      * @return The index of the first null byte in the array, or the length of the array if no null byte is found.
      */
+    @Contract(pure = true)
     public static int indexOfNullByte(byte[] data) {
         if (data == null) return 0;
 
@@ -102,7 +105,7 @@ public final class Util {
     }
 
     // Helper function to concatenate byte arrays
-    public static byte @NotNull [] concatenateArrays(byte[]... data) {
+    public static byte @NotNull [] concatenateArrays(byte[] @NotNull ... data) {
         int totalLength = 0;
 
         for (byte[] array : data) totalLength += array.length;
@@ -207,6 +210,7 @@ public final class Util {
         return ord(data[0]);
     }
 
+    @Contract(pure = true)
     public static int ord(byte data) {
         return data & 0xFF;
     }
@@ -221,6 +225,7 @@ public final class Util {
         return list;
     }
 
+    @Contract("null, _ -> false; !null, null -> false")
     public static boolean contains(byte[] haystack, byte[] needle) {
         if (haystack == null || needle == null) return false;
 
@@ -231,6 +236,7 @@ public final class Util {
         return false;
     }
 
+    @Contract(value = "null, _ -> false", pure = true)
     public static boolean contains(int[] haystack, int needle) {
         if (haystack == null) return false;
 
@@ -241,6 +247,7 @@ public final class Util {
         return false;
     }
 
+    @Contract("_ -> !null")
     public static Set<String> toSet(String string) {
         if (string == null) return Collections.emptySet();
         return Collections.singleton(string);
@@ -254,6 +261,7 @@ public final class Util {
      * @param s a comma-separated string.
      * @return an ordered set of strings.
      */
+    @Contract("null -> !null")
     public static Set<String> commaSeparatedStringToSet(String s) {
         if (s == null) return Collections.emptySet();
         return Arrays.stream(s.split(",")).collect(LinkedHashSet::new, Set::add, Set::addAll);
@@ -268,6 +276,7 @@ public final class Util {
     }
 
     // Helper method to find the index of a byte in a byte array, similar to Python's find() method.
+    @Contract(pure = true)
     public static int indexOf(byte[] data, byte value) {
         if (data == null) return -1; // Returns -1 if the array is null
 
@@ -289,6 +298,7 @@ public final class Util {
      * @param set a set of strings.
      * @return <code>true</code> if the set is <code>null</code>, empty or contains only blank strings, <code>false</code> otherwise.
      */
+    @Contract("null -> true")
     public static boolean practicalIsEmpty(Set<String> set) {
         return set == null || set.isEmpty() || set.stream().allMatch(String::isBlank);
     }
